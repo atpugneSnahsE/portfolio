@@ -5680,8 +5680,8 @@ body.minimal {
 .hero-full-container {
   width: 100vw;
   height: 100vh;
-  background-image: url('bg.png');
-  background-size: cover;              /* Changed from 'contain' to 'cover' */
+  background-image: url('bg.jpg');
+  background-size: contain;              /* Changed from 'contain' to 'cover' */
   background-repeat: no-repeat;
   background-position: center;
   background-attachment: fixed;         /* Optional: creates parallax effect */
@@ -6199,3 +6199,4 @@ textarea {
 
 
 /*# sourceMappingURL=main.70a66962.map*/
+
