@@ -5678,9 +5678,22 @@ body.minimal {
 }
 
 .hero-full-container {
-    height: 100vh
+  width: 100vw;
+  height: 100vh;
+  background-image: url('bg.png');
+  background-size: cover;              /* Changed from 'contain' to 'cover' */
+  background-repeat: no-repeat;
+  background-position: center;
+  background-attachment: fixed;         /* Optional: creates parallax effect */
 }
 
+/* Optional: Ensure crisp rendering for high-res images */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .hero-full-container {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
 .hero-full-container h1 {
     font-family: Roboto, Helvetica, Arial, sans-serif;
     font-weight: 900
@@ -6183,5 +6196,6 @@ textarea {
     float: left;
     margin-right: 5px
 }
+
 
 /*# sourceMappingURL=main.70a66962.map*/
