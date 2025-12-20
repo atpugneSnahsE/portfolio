@@ -17,7 +17,12 @@
 
   <title>Contact Me</title>  
 
-<link href="./main.3f6952e4.css" rel="stylesheet"></head>
+  <link href="./main.3f6952e4.css" rel="stylesheet">
+  
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+</head>
 
 <body class="">
 <div id="site-border-left"></div>
@@ -60,19 +65,22 @@
           
           <div class="row">
             <div class="col-md-10 col-md-offset-1">
-               <form action="" class="reveal-content">
+               <form id="contactForm" class="reveal-content">
                   <div class="row">
                     <div class="col-md-7">
+                      <!-- Success/Error Messages -->
+                      <div id="formMessage" style="display: none; margin-bottom: 15px;"></div>
+                      
                       <div class="form-group">
-                        <input type="email" class="form-control" id="email" placeholder="Email">
+                        <input type="email" class="form-control" id="email" placeholder="Email" required>
                       </div>
                       <div class="form-group">
-                        <input type="text" class="form-control" id="subject" placeholder="Subject">
+                        <input type="text" class="form-control" id="subject" placeholder="Subject" required>
                       </div>
                       <div class="form-group">
-                        <textarea class="form-control" rows="5" placeholder="Enter your message"></textarea>
+                        <textarea class="form-control" id="message" rows="5" placeholder="Enter your message" required></textarea>
                       </div>
-                      <button type="submit" class="btn btn-default btn-lg">Send</button>
+                      <button type="submit" class="btn btn-default btn-lg" id="submitBtn">Send</button>
                     </div>
                     <div class="col-md-5 address-container">
                       <ul class="list-unstyled">
@@ -108,6 +116,9 @@
                       <a href="https://www.linkedin.com/in/eshansengupta" title="" class="fa-icon">
                         <i class="fa fa-linkedin"></i>
                       </a>
+                      <a href="https://drive.google.com/file/d/1jhfs5yaW6w6VagiAsKGl86DCA7TiyQUj/view?usp=sharing" title="" class="fa-icon">
+                        <i class="fa fa-file-text-o"></i>
+                      </a>
 
                     </div>
                   </div>
@@ -133,26 +144,95 @@
 </footer>
 
 <script>
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyCfGN0t7_QSpH-bVL9dQO-jxlNdWolaWbg",
+  authDomain: "esportfolio-bc89b.firebaseapp.com",
+  projectId: "esportfolio-bc89b",
+  storageBucket: "esportfolio-bc89b.firebasestorage.app",
+  messagingSenderId: "930775713824",
+  appId: "1:930775713824:web:07187ef44ea6c445b1d445",
+  measurementId: "G-SRKLX31E1H"
+};
+
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  // Form submission handler
+  document.getElementById('contactForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const submitBtn = document.getElementById('submitBtn');
+    const formMessage = document.getElementById('formMessage');
+    const email = document.getElementById('email').value;
+    const subject = document.getElementById('subject').value;
+    const message = document.getElementById('message').value;
+    
+    // Disable button and show loading state
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending...';
+    formMessage.style.display = 'none';
+    
+    try {
+      // Add document to Firestore
+      await db.collection('contactMessages').add({
+        email: email,
+        subject: subject,
+        message: message,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        read: false
+      });
+      
+      // Show success message
+      formMessage.style.display = 'block';
+      formMessage.className = 'alert alert-success';
+      formMessage.textContent = '✓ Message sent successfully! I\'ll get back to you soon.';
+      
+      // Reset form
+      document.getElementById('contactForm').reset();
+      
+    } catch (error) {
+      console.error('Error sending message:', error);
+      
+      // Show error message
+      formMessage.style.display = 'block';
+      formMessage.className = 'alert alert-danger';
+      formMessage.textContent = '✗ Failed to send message. Please try again or email me directly.';
+    } finally {
+      // Re-enable button
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Send';
+    }
+  });
+
   document.addEventListener("DOMContentLoaded", function (event) {
      navActivePage();
   });
 </script>
 
-<!-- Google Analytics: change UA-XXXXX-X to be your site's ID 
+<style>
+  .alert {
+    padding: 15px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+  }
+  
+  .alert-success {
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+  }
+  
+  .alert-danger {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+  }
+</style>
 
-<script>
-  (function (i, s, o, g, r, a, m) {
-    i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
-      (i[r].q = i[r].q || []).push(arguments)
-    }, i[r].l = 1 * new Date(); a = s.createElement(o),
-      m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
-  })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
-  ga('create', 'UA-XXXXX-X', 'auto');
-  ga('send', 'pageview');
-</script>
-
---> <script type="text/javascript" src="./main.70a66962.js"></script></body>
-
+<script type="text/javascript" src="./main.70a66962.js"></script>
+</body>
 
 </html>
-
