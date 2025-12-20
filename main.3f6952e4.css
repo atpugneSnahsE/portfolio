@@ -4555,7 +4555,7 @@ tbody.collapse.in {
 }
 
 .navbar-default .navbar-nav>li>a {
-    color: #000
+    color: #fff
 }
 
 .navbar-default .navbar-nav>li>a:focus,
@@ -4659,7 +4659,7 @@ fieldset[disabled] .navbar-default .btn-link:hover {
 }
 
 .navbar-inverse .navbar-brand {
-    color: #000
+    color: #fff
 }
 
 .navbar-inverse .navbar-brand:focus,
@@ -4670,7 +4670,7 @@ fieldset[disabled] .navbar-default .btn-link:hover {
 
 .navbar-inverse .navbar-nav>li>a,
 .navbar-inverse .navbar-text {
-    color: #000
+    color: #fff
 }
 
 .navbar-inverse .navbar-nav>.active>a,
@@ -4690,16 +4690,16 @@ fieldset[disabled] .navbar-default .btn-link:hover {
 }
 
 .navbar-inverse .navbar-toggle {
-    border-color: #333
+    border-color: #fff
 }
 
 .navbar-inverse .navbar-toggle:focus,
 .navbar-inverse .navbar-toggle:hover {
-    background-color: #333
+    background-color: #fff
 }
 
 .navbar-inverse .navbar-toggle .icon-bar {
-    background-color: #000
+    background-color: #fff
 }
 
 .navbar-inverse .navbar-collapse,
