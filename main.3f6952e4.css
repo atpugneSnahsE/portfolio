@@ -4536,7 +4536,7 @@ tbody.collapse.in {
 }
 
 .navbar-default {
-    background-color: #fff;
+    background-color: transparent;
     border-color: transparent
 }
 
@@ -4555,7 +4555,7 @@ tbody.collapse.in {
 }
 
 .navbar-default .navbar-nav>li>a {
-    color: #fff
+    color: #000
 }
 
 .navbar-default .navbar-nav>li>a:focus,
@@ -4588,7 +4588,7 @@ tbody.collapse.in {
 }
 
 .navbar-default .navbar-toggle .icon-bar {
-    background-color: #000
+    background-color: #fff
 }
 
 .navbar-default .navbar-collapse,
@@ -5632,7 +5632,7 @@ button.close {
 #site-border-left,
 #site-border-right,
 #site-border-top {
-    background: #000;
+    background: transparent;
     position: fixed;
     z-index: 1
 }
@@ -5678,21 +5678,23 @@ body.minimal {
 }
 
 .hero-full-container {
-  width: 7680px;
-  height: 4321px;
-  background-size: contain;        
-  background-repeat: no-repeat;
-  background-position: center;
-  background-attachment: fixed;    
+    width: 7680px;
+    height: 4321px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-attachment: fixed;
 }
 
 /* Optional: Ensure crisp rendering for high-res images */
-@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-  .hero-full-container {
-    image-rendering: -webkit-optimize-contrast;
-    image-rendering: crisp-edges;
-  }
+@media (-webkit-min-device-pixel-ratio: 2),
+(min-resolution: 192dpi) {
+    .hero-full-container {
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
+    }
 }
+
 .hero-full-container h1 {
     font-family: Roboto, Helvetica, Arial, sans-serif;
     font-weight: 900
@@ -6198,5 +6200,3 @@ textarea {
 
 
 /*# sourceMappingURL=main.70a66962.map*/
-
-
