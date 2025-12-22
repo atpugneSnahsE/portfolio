@@ -2,200 +2,116 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="Home page with interactive particle background">
-  <meta name="google" content="notranslate">
-  <meta name="msapplication-tap-highlight" content="no">
-  <link rel="apple-touch-icon" sizes="180x180" href="./assets/images/favicon.png">
-  <link rel="icon" href="./assets/images/favicon.png">
   <title>Home page</title>
+  
   <link href="./main.3f6952e4.css" rel="stylesheet">
 
   <style>
     body.minimal {
-      margin:0;
-      padding:0;
+      margin: 0;
+      padding: 0;
       background: #1a1a1a;
-      overflow:hidden;
+      overflow-x: hidden; /* Prevent horizontal scroll on mobile */
     }
 
-    /* Particle Canvas Background */
-    #particleCanvas {
+    /* 1. BACKGROUND: COMBINED GRADIENT + NEURAL CANVAS */
+    #neuralCanvas {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
       z-index: -1;
-      background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 25%, #404040 50%, #5a5a5a 75%, #6e6e6e 100%);
+      /* Animated Gradient from your 1st version */
+      background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 25%, #464141 50%, #5a5a5a 75%, #6e6e6e 100%);
       background-size: 400% 400%;
       animation: gradientFlow 20s ease infinite;
     }
 
     @keyframes gradientFlow {
       0% { background-position: 0% 50%; }
-      25% { background-position: 50% 100%; }
       50% { background-position: 100% 50%; }
-      75% { background-position: 50% 0%; }
       100% { background-position: 0% 50%; }
     }
 
+    /* 2. FIXING THE NAV BAR FOR MOBILE */
+    .navbar {
+      z-index: 9999 !important; /* Ensure it sits above everything */
+    }
+
+    /* Ensure the hamburger button and dropdown are clickable */
+    .navbar-toggle {
+      z-index: 10000 !important;
+      background-color: rgba(255,255,255,0.1); /* Slight visibility */
+    }
+
+    .navbar-collapse.collapse.in {
+      background: rgba(0, 0, 0, 0.9); /* Dark background so mobile menu is readable */
+      display: block !important;
+    }
+
+    /* 3. HERO CONTAINER (WITHOUT BUTTONS) */
     .hero-full-container {
-      background: transparent;
-      min-height:100vh;
-      width:100%;
-      position:relative;
-      z-index:100;
+      min-height: 100vh;
+      width: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
-      pointer-events: none;
-    }
-
-    /* Centered connect button with glass morphism */
-    .connect-button {
-      background: rgba(255, 255, 255, 0.15);
-      color: #ffffff;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      padding: 18px 50px;
-      font-size: 1.8rem;
-      font-weight: bold;
-      text-decoration: none;
-      border-radius: 60px;
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      display: inline-block;
-      pointer-events: auto;
-      cursor: pointer;
-      z-index: 1000;
+      pointer-events: none; /* Allows clicks to pass through to canvas if needed */
       position: relative;
-      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-      letter-spacing: 1px;
+      z-index: 1;
     }
 
-    .connect-button:hover {
-      background: rgba(255, 255, 255, 0.25);
-      transform: scale(1.08) translateY(-5px);
-      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(255, 255, 255, 0.2);
-      border-color: rgba(255, 255, 255, 0.5);
+    /* Original Borders if they existed in your CSS */
+    #site-border-left, #site-border-right, #site-border-top, #site-border-bottom {
+      z-index: 5000;
     }
 
-    .connect-button:active {
-      transform: scale(1.02);
-    }
+    /* 4. PERSISTENT "LEARN ABOUT ME" BUTTON */
+.learn-about-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9000; /* Above canvas, below navbar */
+  padding: 12px 20px;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(6px);
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.25s ease;
+}
 
-    /* Floating shapes decoration */
-    .floating-shapes {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 0;
-      pointer-events: none;
-      overflow: hidden;
-    }
+.learn-about-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.6);
+}
 
-    .shape {
-      position: absolute;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 50%;
-      animation: float 20s infinite ease-in-out;
-    }
-
-    .shape:nth-child(1) {
-      width: 80px;
-      height: 80px;
-      top: 20%;
-      left: 10%;
-      animation-delay: 0s;
-      animation-duration: 15s;
-    }
-
-    .shape:nth-child(2) {
-      width: 60px;
-      height: 60px;
-      top: 60%;
-      left: 80%;
-      animation-delay: 2s;
-      animation-duration: 18s;
-    }
-
-    .shape:nth-child(3) {
-      width: 100px;
-      height: 100px;
-      top: 40%;
-      left: 70%;
-      animation-delay: 4s;
-      animation-duration: 22s;
-    }
-
-    .shape:nth-child(4) {
-      width: 70px;
-      height: 70px;
-      top: 70%;
-      left: 20%;
-      animation-delay: 1s;
-      animation-duration: 16s;
-    }
-
-    .shape:nth-child(5) {
-      width: 90px;
-      height: 90px;
-      top: 10%;
-      left: 60%;
-      animation-delay: 3s;
-      animation-duration: 20s;
-    }
-
-    @keyframes float {
-      0%, 100% {
-        transform: translateY(0) translateX(0) rotate(0deg);
-        opacity: 0.3;
-      }
-      25% {
-        transform: translateY(-30px) translateX(20px) rotate(90deg);
-        opacity: 0.5;
-      }
-      50% {
-        transform: translateY(-60px) translateX(-20px) rotate(180deg);
-        opacity: 0.3;
-      }
-      75% {
-        transform: translateY(-30px) translateX(30px) rotate(270deg);
-        opacity: 0.5;
-      }
-    }
+/* Mobile refinement */
+@media (max-width: 768px) {
+  .learn-about-btn {
+    bottom: 16px;
+    right: 16px;
+    padding: 10px 16px;
+    font-size: 12px;
+  }
+}
   </style>
 </head>
 
 <body class="minimal">
 
-  <!-- Particle Canvas Background -->
-  <canvas id="particleCanvas"></canvas>
-
-  <!-- Floating Shapes -->
-  <div class="floating-shapes">
-    <div class="shape"></div>
-    <div class="shape"></div>
-    <div class="shape"></div>
-    <div class="shape"></div>
-    <div class="shape"></div>
-  </div>
-
-  <div id="site-border-left"></div>
-  <div id="site-border-right"></div>
-  <div id="site-border-top"></div>
-  <div id="site-border-bottom"></div>
+  <canvas id="neuralCanvas"></canvas>
 
   <header>
     <nav class="navbar navbar-fixed-top navbar-inverse">
       <div class="container">
-        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse"
-          aria-expanded="false">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse">
           <span class="sr-only">Toggle navigation</span>
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
@@ -215,146 +131,93 @@
     </nav>
   </header>
 
-  <div class="hero-full-container">
-    <!-- Centered "Let's Connect" button -->
-    <a href="./contact.html" class="connect-button">Let's Connect</a>
-  </div>
+  <div class="hero-full-container"></div>
+
+  <script src="./main.70a66962.js"></script>
 
   <script>
-    // Particle System
-    const canvas = document.getElementById('particleCanvas');
+    /** NEURAL BACKGROUND LOGIC **/
+    const canvas = document.getElementById('neuralCanvas');
     const ctx = canvas.getContext('2d');
+    let nodes = [];
+    const maxDistance = 150;
+    const mouse = { x: null, y: null };
 
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    let particlesArray = [];
-    let mouse = {
-      x: null,
-      y: null,
-      radius: 150
-    };
-
-    window.addEventListener('mousemove', function(event) {
-      mouse.x = event.x;
-      mouse.y = event.y;
+    window.addEventListener('mousemove', e => { 
+      mouse.x = e.clientX; 
+      mouse.y = e.clientY; 
     });
 
-    window.addEventListener('resize', function() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      init();
+    // Handle touch for mobile background interaction
+    window.addEventListener('touchmove', e => {
+      mouse.x = e.touches[0].clientX;
+      mouse.y = e.touches[0].clientY;
     });
 
-    class Particle {
-      constructor(x, y, directionX, directionY, size, color) {
-        this.x = x;
-        this.y = y;
-        this.directionX = directionX;
-        this.directionY = directionY;
-        this.size = size;
-        this.color = color;
+    class Node {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 2 + 0.5;
+        this.speedX = (Math.random() - 0.5) * 0.4;
+        this.speedY = (Math.random() - 0.5) * 0.4;
       }
-
-      draw() {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
-        ctx.fillStyle = this.color;
-        ctx.fill();
-      }
-
       update() {
-        if (this.x > canvas.width || this.x < 0) {
-          this.directionX = -this.directionX;
-        }
-        if (this.y > canvas.height || this.y < 0) {
-          this.directionY = -this.directionY;
-        }
-
-        // Mouse interaction
-        let dx = mouse.x - this.x;
-        let dy = mouse.y - this.y;
-        let distance = Math.sqrt(dx * dx + dy * dy);
-        
-        if (distance < mouse.radius + this.size) {
-          if (mouse.x < this.x && this.x < canvas.width - this.size * 10) {
-            this.x += 3;
-          }
-          if (mouse.x > this.x && this.x > this.size * 10) {
-            this.x -= 3;
-          }
-          if (mouse.y < this.y && this.y < canvas.height - this.size * 10) {
-            this.y += 3;
-          }
-          if (mouse.y > this.y && this.y > this.size * 10) {
-            this.y -= 3;
-          }
-        }
-
-        this.x += this.directionX;
-        this.y += this.directionY;
-        this.draw();
+        this.x += this.speedX;
+        this.y += this.speedY;
+        if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+        if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+      }
+      draw() {
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
       }
     }
 
     function init() {
-      particlesArray = [];
-      let numberOfParticles = (canvas.height * canvas.width) / 9000;
-      
-      for (let i = 0; i < numberOfParticles; i++) {
-        let size = (Math.random() * 3) + 1;
-        let x = (Math.random() * ((innerWidth - size * 2) - (size * 2)) + size * 2);
-        let y = (Math.random() * ((innerHeight - size * 2) - (size * 2)) + size * 2);
-        let directionX = (Math.random() * 1) - 0.5;
-        let directionY = (Math.random() * 1) - 0.5;
-        let color = 'rgba(255, 255, 255, 0.8)';
-
-        particlesArray.push(new Particle(x, y, directionX, directionY, size, color));
-      }
-    }
-
-    function connect() {
-      let opacityValue = 1;
-      for (let a = 0; a < particlesArray.length; a++) {
-        for (let b = a; b < particlesArray.length; b++) {
-          let distance = ((particlesArray[a].x - particlesArray[b].x) * (particlesArray[a].x - particlesArray[b].x))
-          + ((particlesArray[a].y - particlesArray[b].y) * (particlesArray[a].y - particlesArray[b].y));
-          
-          if (distance < (canvas.width / 7) * (canvas.height / 7)) {
-            opacityValue = 1 - (distance / 20000);
-            ctx.strokeStyle = 'rgba(255, 255, 255, ' + opacityValue + ')';
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
-            ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
-            ctx.stroke();
-          }
-        }
-      }
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      nodes = [];
+      // Fewer nodes on mobile for better performance
+      const nodeCount = window.innerWidth < 768 ? 40 : 100;
+      for (let i = 0; i < nodeCount; i++) nodes.push(new Node());
     }
 
     function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      nodes.forEach(node => {
+        node.update();
+        node.draw();
+        
+        nodes.forEach(target => {
+          const dx = node.x - target.x;
+          const dy = node.y - target.y;
+          const dist = Math.sqrt(dx*dx + dy*dy);
+          
+          if (dist < maxDistance) {
+            const mouseDist = Math.sqrt(Math.pow(node.x - mouse.x, 2) + Math.pow(node.y - mouse.y, 2));
+            const opacity = (1 - dist / maxDistance) * (mouseDist < 150 ? 0.6 : 0.15);
+            
+            ctx.strokeStyle = `rgba(255, 255, 255, ${opacity})`;
+            ctx.lineWidth = 0.5;
+            ctx.beginPath();
+            ctx.moveTo(node.x, node.y);
+            ctx.lineTo(target.x, target.y);
+            ctx.stroke();
+          }
+        });
+      });
       requestAnimationFrame(animate);
-      ctx.clearRect(0, 0, innerWidth, innerHeight);
-
-      for (let i = 0; i < particlesArray.length; i++) {
-        particlesArray[i].update();
-      }
-      connect();
     }
 
     init();
     animate();
-
-    // Original moving background function
-    document.addEventListener("DOMContentLoaded", function () {
-      if (typeof movingBackgroundImage === 'function') {
-        movingBackgroundImage();
-      }
-    });
+    window.addEventListener('resize', init);
   </script>
-
-  <script src="./main.70a66962.js"></script>
-
+  <a href="./about.html" class="learn-about-btn">
+  Learn about me
+</a>
 </body>
 </html>
