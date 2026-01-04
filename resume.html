@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Eshan Sengupta – Resume</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+:root {
+  --bg: #faf7ef;
+  --text: #111111;
+  --muted: #6f6f6f;
+  --accent: #e23b2e;
+  --rule: #d6d3cc;
+  --dot-yellow: #f2c94c;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.55;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.wrapper {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 0 40px;
+}
+
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.top-buttons {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.download, .home-btn {
+  padding: 10px 20px;
+  font-size: 14px;
+  text-decoration: none;
+  border-radius: 4px;
+  font-weight: 600;
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.download {
+  background: var(--accent);
+  color: #fff;
+}
+
+.download:hover {
+  background: #d32f21;
+  transform: translateY(-2px);
+}
+
+.home-btn {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--rule);
+}
+
+.home-btn:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.home-btn i {
+  font-size: 16px;
+}
+
+.rule {
+  border-top: 1px solid var(--rule);
+  margin: 30px 0;
+}
+
+/* Header Section */
+.header {
+  margin-bottom: 40px;
+}
+
+.name {
+  font-size: 3rem;
+  font-weight: 700;
+  letter-spacing: -1px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.name::before {
+  content: "";
+  width: 24px;
+  height: 24px;
+  background: var(--dot-yellow);
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(242, 201, 76, 0.4);
+}
+
+.title {
+  font-size: 1rem;
+  color: var(--muted);
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+
+.contact {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.contact a {
+  text-decoration: none;
+  color: var(--text);
+  transition: color 0.25s ease;
+}
+
+.contact a:hover {
+  color: var(--accent);
+}
+
+.summary {
+  font-size: 15px;
+  color: var(--muted);
+  line-height: 1.7;
+  max-width: 700px;
+}
+
+/* Two Column Layout */
+.content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 50px;
+}
+
+/* Section Headers */
+.section-title {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.section-title::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  background: var(--accent);
+  border-radius: 50%;
+}
+
+/* Experience Items */
+.exp-item {
+  margin-bottom: 28px;
+}
+
+.exp-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 6px;
+  gap: 12px;
+}
+
+.exp-role {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.exp-date {
+  font-size: 13px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.exp-company {
+  font-size: 14px;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+.exp-desc {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.exp-desc ul {
+  margin-top: 6px;
+  padding-left: 18px;
+}
+
+.exp-desc li {
+  margin-bottom: 4px;
+}
+
+/* Sidebar Sections */
+.sidebar-section {
+  margin-bottom: 30px;
+}
+
+.sidebar-item {
+  font-size: 14px;
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+
+.sidebar-item strong {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 3px;
+}
+
+.sidebar-item .detail {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.highlight {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* Skills Tags */
+.skill-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.skill-tag {
+  background: #fff;
+  padding: 5px 11px;
+  font-size: 12px;
+  border: 1px solid var(--rule);
+  color: var(--muted);
+  border-radius: 3px;
+  transition: all 0.2s ease;
+}
+
+.skill-tag:hover {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #fff;
+}
+
+/* Publications */
+.pub-item {
+  margin-bottom: 18px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.pub-title {
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 3px;
+}
+
+.pub-meta {
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* Theme Toggle */
+.theme-toggle {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 1000;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: all 0.25s ease;
+}
+
+.theme-toggle:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+
+.theme-toggle svg {
+  width: 22px;
+  height: 22px;
+  color: var(--text);
+}
+
+/* Dark Theme */
+.dark-theme {
+  --bg: #1a1a1a;
+  --text: #ffffff;
+  --muted: #b0b0b0;
+  --rule: #3a3a3a;
+}
+
+.dark-theme .skill-tag {
+  background: #242424;
+  border-color: #3a3a3a;
+}
+
+.dark-theme .skill-tag:hover {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #fff;
+}
+
+/* Custom Cursor */
+.custom-cursor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  transition: width 0.2s ease, height 0.2s ease, opacity 0.3s ease;
+  z-index: 9999;
+  background: rgba(226, 59, 46, 0.3);
+  box-shadow: 0 0 12px 6px rgba(226, 59, 46, 0.2);
+  opacity: 0;
+}
+
+.custom-cursor.moving {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1.5);
+}
+
+.has-custom-cursor {
+  cursor: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .content {
+    grid-template-columns: 1fr;
+  }
+  
+  .wrapper {
+    padding: 0 20px;
+    margin: 20px auto;
+  }
+  
+  .name {
+    font-size: 2.2rem;
+  }
+  
+  .contact {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .exp-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media print {
+  .theme-toggle,
+  .download {
+    display: none;
+  }
+  
+  body {
+    background: white;
+  }
+  
+  .wrapper {
+    max-width: 100%;
+    margin: 0;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- Theme Toggle Button -->
+<button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+  <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2M12 19v2M4.22 4.22l1.4 1.4M18.36 18.36l1.4 1.4M1 12h2M21 12h2M4.22 19.78l1.4-1.4M18.36 5.64l1.4-1.4M12 7a5 5 0 100 10 5 5 0 000-10z"/>
+  </svg>
+</button>
+
+<!-- Custom Cursor -->
+<div class="custom-cursor" aria-hidden="true"></div>
+
+<div class="wrapper">
+
+  <div class="top-bar">
+    <div class="top-buttons">
+      <a class="home-btn" href="index.html">
+        <i class="fas fa-home"></i> Home
+      </a>
+      <a class="download" href="https://drive.google.com/file/d/1bg5KMcuTUyNWLYSNmNILUgQtluLjoP42/view?usp=sharing">
+        <i class="fas fa-download"></i> Download PDF
+      </a>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="name">Eshan Sengupta</div>
+    <div class="title">AI Researcher • MS Artificial Intelligence</div>
+    <div class="contact">
+      <a href="mailto:eshansengupta2000@gmail.com">eshansengupta2000@gmail.com</a>
+      <span>•</span>
+      <a href="tel:+37065462070">+370 654 620 70</a>
+      <span>•</span>
+      <a href="https://linkedin.com/in/eshansengupta" target="_blank">LinkedIn</a>
+      <span>•</span>
+      <a href="https://github.com/atpugneSnahsE" target="_blank">GitHub</a>
+    </div>
+    <p class="summary">
+      AI researcher specializing in intelligent systems, fog computing, and safety-critical applications. 
+      11+ peer-reviewed publications in Springer/IEEE. Building scalable ML solutions with measurable impact.
+    </p>
+  </div>
+
+  <div class="rule"></div>
+
+  <div class="content">
+    <!-- Main Column -->
+    <div>
+      <!-- Experience -->
+      <div class="section-title">Experience</div>
+      
+      <div class="exp-item">
+        <div class="exp-header">
+          <div class="exp-role">IT Business Analyst Intern</div>
+          <div class="exp-date">Sep 2024 – Mar 2025</div>
+        </div>
+        <div class="exp-company">Bangladesh Steel Re-Rolling Mills (BSRM)</div>
+        <div class="exp-desc">
+          Engineered ML pipeline for vehicle plate recognition, developed time-series sales forecasting models, 
+          and implemented Oracle APEX solutions, reducing manual processing by 40%.
+        </div>
+      </div>
+
+      <div class="exp-item">
+        <div class="exp-header">
+          <div class="exp-role">Oracle SQL/PL-SQL Trainee</div>
+          <div class="exp-date">Aug 2024 – Sep 2024</div>
+        </div>
+        <div class="exp-company">New Technology Systems Limited</div>
+        <div class="exp-desc">
+          Intensive training in database optimization, query tuning, and enterprise application development 
+          with Oracle 10g/19c.
+        </div>
+      </div>
+
+      <div class="rule"></div>
+<!-- Volunteer Experience -->
+      <div class="section-title">Volunteer Roles</div>
+      <div class="exp-item">
+        <div class="exp-header">
+          <div class="exp-role">Student Ambassador</div>
+          <div class="exp-date">Apr 2023 – Jul 2024</div>
+        </div>
+        <div class="exp-company">Microsoft Learn</div>
+        <div class="exp-desc">
+          Led 40+ participant workshops on Azure AI services. Reached 2nd-highest program milestone.
+        </div>
+      </div>
+
+      <div class="exp-item">
+        <div class="exp-header">
+          <div class="exp-role">AI/ML Lead</div>
+          <div class="exp-date">2022 – 2023</div>
+        </div>
+        <div class="exp-company">Google Developer Student Clubs</div>
+        <div class="exp-desc">
+          Mentored 60+ participants in Google Cloud ML. Achieved Tier 3 with 35+ certifications.
+        </div>
+      </div>
+
+      <div class="rule"></div>
+
+      <!-- Key Publications -->
+      <div class="section-title">Selected Publications (11 total)</div>
+
+      <div class="pub-item">
+        <div class="pub-title">Energy-Efficient Framework for Non-Latin License Plate Recognition (2025)</div>
+        <div class="pub-meta">International Journal of Intelligent Transportation Systems Research, Springer</div>
+      </div>
+
+      <div class="pub-item">
+        <div class="pub-title">Fog-Cloud Visual Assistance for Blind and Visually-Impaired (2024)</div>
+        <div class="pub-meta">Multimedia Tools and Applications, Springer • 94% accuracy</div>
+      </div>
+
+      <div class="pub-item">
+        <div class="pub-title">IoT-Fog Framework for Train Passenger Safety (2023)</div>
+        <div class="pub-meta">Multimedia Tools and Applications, Springer • 78% latency reduction</div>
+      </div>
+
+      <div class="pub-item">
+        <div class="pub-title">AI Framework for Preventing Violence with Gait Recognition (2023)</div>
+        <div class="pub-meta">Soft Computing, Springer Berlin Heidelberg</div>
+      </div>
+
+      <div class="pub-item">
+        <div class="pub-title">SDG-4 Optimization using Genetic Algorithms (2022)</div>
+        <div class="pub-meta">Education and Information Technologies, Springer</div>
+      </div>
+
+    </div>
+
+    <!-- Sidebar -->
+    <div>
+      <!-- Education -->
+      <div class="sidebar-section">
+        <div class="section-title">Education</div>
+        <div class="sidebar-item">
+          <strong>MSc, AI Systems</strong>
+          <div class="detail">Vilnius Tech, Lithuania</div>
+          <div class="detail">2024 – 2027</div>
+        </div>
+        <div class="sidebar-item">
+          <strong>BTech, CS&E</strong>
+          <div class="detail">Guru Nanak Dev University</div>
+          <div class="detail">2020 – 2024</div>
+          <div class="detail"><span class="highlight">GPA: 8.27/10</span></div>
+        </div>
+      </div>
+
+      <!-- Skills -->
+      <div class="sidebar-section">
+        <div class="section-title">Core Skills</div>
+        <div class="skill-tags">
+          <span class="skill-tag">Python</span>
+          <span class="skill-tag">Machine Learning</span>
+          <span class="skill-tag">Deep Learning</span>
+          <span class="skill-tag">SQL/PL-SQL</span>
+          <span class="skill-tag">Oracle APEX</span>
+          <span class="skill-tag">Computer Vision</span>
+          <span class="skill-tag">IoT/Fog Computing</span>
+          <span class="skill-tag">PyTorch</span>
+          <span class="skill-tag">OpenCV</span>
+          <span class="skill-tag">Power BI</span>
+          <span class="skill-tag">Git</span>
+          <span class="skill-tag">Agile/Scrum</span>
+        </div>
+      </div>
+
+      <!-- Honors -->
+      <div class="sidebar-section">
+        <div class="section-title">Honors</div>
+        <div class="sidebar-item">
+          <strong>ICCR Scholarship</strong>
+          <div class="detail">Full scholarship for BTech</div>
+          <div class="detail">2020-2024</div>
+        </div>
+      </div>
+
+      <!-- Memberships -->
+      <div class="sidebar-section">
+        <div class="section-title">Memberships</div>
+        <div class="sidebar-item">
+          <strong>SCITP</strong>
+          <div class="detail">Society of Chittagong IT Professionals</div>
+        </div>
+      </div>
+
+      <!-- Languages -->
+      <div class="sidebar-section">
+        <div class="section-title">Languages</div>
+        <div class="sidebar-item">
+          <strong>Bengali</strong> – Native<br>
+          <strong>English</strong> – Proficient (C1)
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // Theme Toggle
+  const themeToggle = document.getElementById('themeToggle');
+  const themeIcon = document.getElementById('themeIcon');
+  const savedTheme = localStorage.getItem('theme') || 'light';
+  
+  if (savedTheme === 'dark') {
+    document.documentElement.classList.add('dark-theme');
+    themeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z"/>';
+  }
+  
+  themeToggle.addEventListener('click', () => {
+    const isDark = document.documentElement.classList.toggle('dark-theme');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    
+    if (isDark) {
+      themeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z"/>';
+    } else {
+      themeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2M12 19v2M4.22 4.22l1.4 1.4M18.36 18.36l1.4 1.4M1 12h2M21 12h2M4.22 19.78l1.4-1.4M18.36 5.64l1.4-1.4M12 7a5 5 0 100 10 5 5 0 000-10z"/>';
+    }
+  });
+
+  // Custom Cursor
+  if (!('ontouchstart' in window)) {
+    const cursor = document.querySelector('.custom-cursor');
+    let mouseX = 0, mouseY = 0;
+    let cursorX = 0, cursorY = 0;
+    let idleTimer;
+
+    document.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      cursor.classList.add('moving');
+      
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(() => {
+        cursor.classList.remove('moving');
+      }, 150);
+    });
+
+    function animateCursor() {
+      cursorX += (mouseX - cursorX) * 0.15;
+      cursorY += (mouseY - cursorY) * 0.15;
+      cursor.style.left = cursorX + 'px';
+      cursor.style.top = cursorY + 'px';
+      requestAnimationFrame(animateCursor);
+    }
+    animateCursor();
+    
+    document.body.classList.add('has-custom-cursor');
+  }
+</script>
+
+</body>
+</html>

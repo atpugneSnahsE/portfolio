@@ -1,0 +1,889 @@
+{
+  "metadata": {
+    "name": "Eshan Sengupta",
+    "title": "AI Research Scholar & Business Analyst",
+    "lastUpdated": "2026-01-04",
+    "description": "Enhanced knowledge base with conversational patterns for natural interactions"
+  },
+  
+  "conversationalPatterns": {
+    "whoIsEshan": [
+      "I'm an AI researcher and Business Analyst currently pursuing my Master's in AI Systems at VILNIUS TECH in Lithuania. I love building intelligent systems that solve real-world problems!",
+      "Think of me as someone who bridges AI research and practical business solutions. I've published 11 research papers and work on everything from computer vision to IoT systems.",
+      "I'm a tech enthusiast who's passionate about AI, machine learning, and making technology accessible. Currently studying in Lithuania and working on exciting AI projects!"
+    ],
+
+    "whatDoesHeDo": [
+      "I work on AI and machine learning projects, focusing on computer vision, IoT systems, and educational technology. I also do business analysis, helping organizations optimize their processes with data-driven solutions.",
+      "My work spans research (publishing papers on AI applications) and practical implementation (business analysis, database management, AI system development). I love both theory and getting my hands dirty with real projects!",
+      "I develop intelligent systems that solve problems in education, safety, and accessibility. This includes everything from fire detection systems to visual assistance for blind people, plus business process optimization."
+    ],
+
+    "whyHireHim": [
+      "I bring a unique combination of deep AI/ML research experience (11 published papers) and practical business skills. I can both build the AI systems and understand the business requirements that drive them.",
+      "I've worked across the full stack - from research and development to business analysis and deployment. Whether you need someone to build an ML model, optimize business processes, or bridge technical and business teams, I can help.",
+      "My experience ranges from cutting-edge research to real-world IT implementations. I understand both the 'what' (business needs) and the 'how' (technical solutions)."
+    ],
+
+    "availability": [
+      "I'm currently pursuing my Master's degree (2025-2027) but I'm available for part-time consulting, freelance projects, and research collaborations. I'm flexible with remote work.",
+      "Open to interesting opportunities. I can take on part-time projects, consulting work, or research collaborations. Full-time opportunities would need to wait until after my Master's (2027).",
+      "I'm actively looking for part-time opportunities and freelance projects that align with my skills in AI/ML, business analysis, or research."
+    ],
+
+    "workAuthorization": [
+      "I'm legally residing in Lithuania as a Master's student and am eligible for full-time, part-time and contractual work engagements under Lithuanian and EU regulations.",
+      "I can work remotely for international clients under freelance or consulting contracts, subject to standard contractual and tax compliance.",
+      "For full-time employment, visa or work authorization requirements can be discussed depending on the country and role."
+    ],
+
+    "employmentType": [
+      "I'm open to part-time roles, freelance contracts, consulting engagements, and research collaborations.",
+      "I can work as an independent contractor or under fixed-term contracts, depending on the organization's preference.",
+      "I'm not available for full-time permanent roles until after completing my Master's degree in 2027."
+    ],
+
+    "locationAndRemote": [
+      "I'm currently based in Lithuania and primarily prefer on-site work.",
+      "I can collaborate across time zones and have experience working with international teams.",
+      "Relocation is not planned during my Master's program, but short-term travel for work or conferences may be possible."
+    ],
+
+    "intellectualProperty": [
+      "I'm comfortable working under standard IP assignment and confidentiality agreements (NDA).",
+      "For research collaborations, I prefer clear agreements on publication rights, authorship, and IP ownership.",
+      "I'm experienced in balancing academic publication requirements with commercial confidentiality."
+    ],
+
+    "taxAndCompliance": [
+      "I can operate under legally compliant freelance or consulting arrangements.",
+      "I'm open to discussing invoicing, tax residency, and compliance requirements based on the client's jurisdiction.",
+      "All engagements should follow transparent and formal contractual terms."
+    ],
+
+    "dataPrivacyAndEthics": [
+      "I follow GDPR-compliant practices when working with personal or sensitive data.",
+      "I have experience designing AI systems with privacy, security, and ethical considerations in mind.",
+      "I'm comfortable adhering to internal compliance, security, and data governance policies."
+    ]
+  },
+
+  "about": {
+    "bio": "I'm Eshan Sengupta, an AI researcher and Business Analyst with a strong background in Computer Science and Artificial Intelligence Systems. Currently pursuing my Master's in AI Systems at VILNIUS TECH in Lithuania, I specialize in developing intelligent frameworks for real-world applications including computer vision, IoT-fog computing, and educational technology. With 11 published research papers in prestigious journals and hands-on experience in business analysis and IT systems, I bridge the gap between cutting-edge AI research and practical business solutions.",
+    
+    "casualBio": "Hey! I'm Eshan - a tech geek who loves AI, coding, and solving real problems. I'm doing my Master's in AI in Lithuania and spend my time building intelligent systems, publishing research papers, and helping companies with their tech challenges. When I'm not coding, you'll find me mentoring students or exploring new ML frameworks!",
+    
+    "quickFacts": [
+      "Based in Vilnius, Lithuania",
+      "Master's student in Artificial Intelligence Systems (Expected 2027)",
+      "11 published research papers in AI and ML",
+      "3+ years of professional experience in IT and Business Analysis",
+      "Microsoft Learn Student Ambassador Alumni",
+      "Member of IEEE, IEB, and SCITP"
+    ],
+    
+    "mission": "My mission is to leverage artificial intelligence and emerging technologies to solve real-world problems, particularly in education, safety, and accessibility. I believe in sustainable development through technology and making AI solutions practical and accessible.",
+    
+    "personality": "I'm naturally curious and love tackling challenging problems. I believe in learning by doing and have led multiple student tech communities because I enjoy sharing knowledge. I'm comfortable working across the stack - from deep neural networks to business requirement documents!"
+  },
+
+  "personalInfo": {
+    "fullName": "Eshan Sengupta",
+    "age": "25 years old",
+    "dateOfBirth": "14th October 2000",
+    "email": "eshansengupta2000@gmail.com",
+    "nationality": "Bangladeshi",
+    "workPermit": "Temporary Residence Permit(TRP)",
+    "gender": "Male",
+    "currentLocation": "Vilnius, Lithuania",
+    "languages": ["English (Fluent)", "Bengali (Native)", "Hindi (Fluent)"],
+    "workingHours": "Flexible, comfortable with different time zones"
+  },
+
+  "skills": {
+    "overview": "My skill set spans technical engineering, applied AI research, business analysis, and collaborative professional skills. I combine hands-on development experience with research depth and the ability to work effectively with diverse stakeholders.",
+
+    "technical": {
+      "summary": "Hands-on technical skills focused on software engineering, AI/ML systems, data handling, and enterprise tools.",
+      
+      "programming": [
+        "Python — advanced proficiency for data processing, machine learning pipelines, automation, and backend services",
+        "SQL — advanced querying, optimization, and analytical reporting",
+        "PL/SQL — intermediate experience with enterprise database logic and stored procedures"
+      ],
+      "aiml": [
+        "End-to-end machine learning pipeline design and implementation",
+        "Computer vision systems for detection, classification, and analysis",
+        "Deep learning and neural network architectures",
+        "Model training, evaluation, optimization, and performance analysis",
+        "Practical experience with TensorFlow, PyTorch, Scikit-learn, and OpenCV"
+      ],
+      "databases": [
+        "Oracle APEX application development and database-backed systems",
+        "Relational database design, normalization, and performance tuning",
+        "Data analysis using structured and semi-structured data",
+        "Experience with PostgreSQL and MongoDB"
+      ],
+      "businessAnalysis": [
+        "Business process modeling using BPMN 2.0",
+        "Requirements elicitation, analysis, and technical documentation",
+        "Gap analysis between current-state and target-state systems",
+        "User story creation and backlog refinement",
+        "Stakeholder coordination and expectation management",
+        "User Acceptance Testing (UAT) planning and execution",
+        "KPI definition and performance measurement"
+      ],
+      "dataVisualization": [
+        "Interactive dashboards and reporting using Power BI",
+        "Automated reporting pipelines for operational and management use",
+        "Exploratory and presentation-quality visualizations using Matplotlib and Seaborn"
+      ],
+      "tools": [
+        "Version control and collaboration with Git",
+        "Project and issue tracking using Jira and Azure DevOps",
+        "Enterprise systems exposure including Oracle E-Business Suite (EBS)",
+        "REST API design, integration, and consumption",
+        "Containerization with Docker",
+        "Experimentation, analysis, and prototyping using Jupyter Notebooks"
+      ],
+      "methodologies": [
+        "Agile Scrum for iterative delivery and collaboration",
+        "Software Development Life Cycle (SDLC)",
+        "ITIL Foundation principles for IT service management",
+        "DevOps fundamentals including CI/CD and deployment workflows"
+      ],
+      "businessDomains": [
+        "B2B and B2C business models",
+        "Order-to-Cash (O2C) process flows",
+        "Procure-to-Pay (P2P) lifecycle",
+        "Enterprise Resource Planning (ERP) systems"
+      ],
+      "other": [
+        "Object-Oriented Programming (OOP) principles",
+        "Version control best practices",
+        "Enterprise IT troubleshooting and support",
+        "Foundational understanding of cybersecurity concepts"
+      ]
+    },
+
+    "research": {
+      "summary": "Research-oriented skills focused on applied AI, experimentation, system design, and real-world impact.",
+      "areas": [
+        "Applied computer vision and image processing",
+        "IoT architectures, including edge and fog computing",
+        "Educational technology systems and learning analytics",
+        "Smart building and automation systems",
+        "Assistive technologies for visually impaired users",
+        "AI-based safety, monitoring, and surveillance systems",
+        "Technology-aligned research supporting Sustainable Development Goal 4 (Quality Education)"
+      ]
+    },
+
+    "softSkills": {
+      "summary": "Professional and interpersonal skills that support collaboration, leadership, and effective execution.",
+      "skills": [
+        "Structured research and academic writing for peer-reviewed venues",
+        "Analytical problem-solving and critical thinking",
+        "Team collaboration across technical and non-technical roles",
+        "Clear stakeholder communication and expectation alignment",
+        "Project coordination, prioritization, and follow-through",
+        "Technical presentations and knowledge sharing",
+        "Mentorship, community engagement, and inclusive teamwork"
+      ]
+    },
+
+    "learningNow": {
+      "summary": "Areas of active learning and skill expansion.",
+      "focus": [
+        "Advanced deep learning architectures and optimization techniques",
+        "Large Language Models (LLMs) and applied NLP systems",
+        "Cloud platforms with emphasis on AWS and Azure",
+        "MLOps practices for scalable, reliable model deployment"
+      ]
+    }
+  },
+
+  "education": [
+    {
+      "degree": "Master of Science in Artificial Intelligence Systems",
+      "institution": "VILNIUS TECH (Vilnius Gediminas Technical University)",
+      "location": "Vilnius, Lithuania",
+      "period": "2025 - 2027 (Expected)",
+      "status": "Currently Enrolled",
+      "focus": "Advanced AI systems, machine learning, and intelligent automation",
+      "why": "I wanted to deepen my AI expertise and study in Europe's growing tech ecosystem. The program combines cutting-edge research with practical applications."
+    },
+    {
+      "degree": "Bachelor of Technology in Computer Science",
+      "institution": "Guru Nanak Dev University",
+      "location": "Amritsar, India",
+      "period": "October 2020 - May 2024",
+      "status": "Completed",
+      "highlights": [
+        "Published 11 research papers during undergraduate studies",
+        "Led multiple student technical communities (GDSC, GeeksforGeeks, CodeDay)",
+        "Microsoft Learn Student Ambassador",
+        "Focus on AI, ML, and Computer Vision",
+        "Maintained strong academic performance while publishing research"
+      ],
+      "achievement": "One of the most productive undergrads in research output - 11 papers in top journals/conferences!"
+    }
+  ],
+
+  "experience": [
+    {
+      "role": "Information Technology Intern",
+      "company": "BSRM (Bangladesh Steel Re-Rolling Mills)",
+      "location": "Bangladesh",
+      "period": "September 2024 - March 2025",
+      "type": "Internship",
+      "description": "Contributed to enterprise-scale IT operations and digital transformation initiatives at one of Bangladesh’s largest steel manufacturing organizations, working at the intersection of IT systems and business operations.",
+      "responsibilities": [
+        "Provided hands-on support for enterprise IT systems and infrastructure",
+        "Analyzed and optimized business processes to improve operational efficiency",
+        "Managed databases and generated decision-support reports for stakeholders",
+        "Collaborated with cross-functional teams to gather and translate IT requirements",
+        "Supported ERP system configuration, troubleshooting, and user workflows"
+      ],
+      "achievements": [
+        "Redesigned reporting workflows, reducing manual effort and saving 10+ hours per week",
+        "Improved system performance through targeted database optimization",
+        "Handled multiple concurrent IT initiatives in a high-demand production environment"
+      ],
+      "technologies": ["Oracle EBS", "SQL", "Power BI", "ITIL"],
+      "learned": "How to quickly adapt to complex enterprise environments and align IT solutions with real-world manufacturing and business constraints."
+    },
+    {
+      "role": "Trainee",
+      "company": "New Technology Systems Ltd.",
+      "location": "Bangladesh",
+      "period": "August 2024 - September 2024",
+      "type": "Training",
+      "description": "Completed an intensive, fast-paced training program focused on enterprise application development and structured business analysis practices.",
+      "responsibilities": [
+        "Developed applications using Oracle APEX under tight learning timelines",
+        "Mapped and documented business processes using formal methodologies",
+        "Translated business requirements into clear technical specifications",
+        "Studied enterprise integration patterns and system interoperability"
+      ],
+      "technologies": ["Oracle APEX", "SQL", "Business Analysis Tools", "BPMN"],
+      "learned": "How to rapidly learn new enterprise technologies and convert ambiguous business needs into structured, implementable system designs."
+    },
+    {
+      "role": "Graduate Engineering Trainee",
+      "company": "Deepesh Cyber Developers",
+      "location": "India",
+      "period": "January 2024 - June 2024",
+      "type": "Trainee",
+      "description": "Worked on production-grade software and AI-enabled systems, gaining end-to-end exposure from development to deployment.",
+      "responsibilities": [
+        "Built, tested, and maintained backend services and APIs",
+        "Integrated machine learning models into real-world applications",
+        "Deployed and monitored ML pipelines in production environments",
+        "Participated in code reviews and authored technical documentation"
+      ],
+      "achievements": [
+        "Deployed 3 computer vision models into production environments",
+        "Developed REST APIs handling over 1,000 requests per day",
+        "Improved maintainability and reliability through structured code reviews"
+      ],
+      "technologies": ["Python", "REST APIs", "Git", "ML Pipelines", "Flask"],
+      "learned": "How to move fast in real production settings and bridge the gap between ML research and scalable, maintainable software systems."
+    }
+  ],
+
+  "publications": [
+    {
+      "title": "Artificial intelligence assisted framework for detecting offensive posters on the premises of educational institutions",
+      "journal": "Cluster Computing",
+      "date": "December 2025",
+      "doi": "10.1007/s10586-025-05606-4",
+      "type": "Journal Article",
+      "keywords": ["AI", "Computer Vision", "Educational Safety", "Image Classification"],
+      "impact": "Springer Q2 journal",
+      "summary": "Developed a computer vision system to automatically detect offensive content on educational campuses, improving campus safety."
+    },
+    {
+      "title": "An Intelligent Energy-Efficient Framework for Real Time Non-Latin License Plate Recognition in Industrial Vehicle Access Control",
+      "journal": "International Journal of Intelligent Transportation Systems Research",
+      "date": "June 19, 2025",
+      "doi": "10.1007/s13177-025-00515-7",
+      "type": "Journal Article",
+      "keywords": ["Computer Vision", "OCR", "Access Control", "Industrial IoT"],
+      "impact": "Springer journal",
+      "summary": "Created an energy-efficient license plate recognition system for industrial environments, handling multiple language scripts."
+    },
+    {
+      "title": "Smart Educational Campuses Leveraging AI and Emerging Technologies for Sustainable Development",
+      "conference": "Global Conference in Emerging Technology (GINOTECH)",
+      "date": "May 9, 2025",
+      "doi": "10.1109/ginotech63460.2025.11076726",
+      "type": "Conference Paper",
+      "keywords": ["Smart Campus", "AI", "Sustainable Development", "EdTech"],
+      "summary": "Explored how AI and IoT can transform educational campuses into smart, sustainable learning environments."
+    },
+    {
+      "title": "AI-assisted hand gestures based smart feedback system for educators",
+      "journal": "Education and Information Technologies",
+      "date": "January 21, 2025",
+      "doi": "10.1007/s10639-025-13358-2",
+      "type": "Journal Article",
+      "keywords": ["Gesture Recognition", "Educational Technology", "AI", "Real-time Systems"],
+      "impact": "Springer Q1 journal",
+      "summary": "Built a real-time gesture recognition system that provides feedback to educators during lectures, improving teaching effectiveness."
+    },
+    {
+      "title": "Artificial intelligence inspired fog-cloud-based visual-assistance framework for blind and visually-impaired people",
+      "journal": "Multimedia Tools and Applications",
+      "date": "September 23, 2024",
+      "doi": "10.1007/s11042-024-20159-1",
+      "type": "Journal Article",
+      "keywords": ["Accessibility", "Fog Computing", "Computer Vision", "Assistive Technology"],
+      "impact": "Springer Q2 journal",
+      "summary": "Developed an assistive technology system using fog-cloud computing to help visually impaired people navigate their environment."
+    },
+    {
+      "title": "Artificial intelligence assisted IoT-fog based framework for emergency fire response in smart buildings",
+      "journal": "Cluster Computing",
+      "date": "April 3, 2024",
+      "doi": "10.1007/s10586-024-04374-x",
+      "type": "Journal Article",
+      "keywords": ["IoT", "Fog Computing", "Emergency Response", "Smart Buildings"],
+      "summary": "Created an intelligent fire detection and response system for smart buildings using IoT sensors and fog computing architecture."
+    },
+    {
+      "title": "An intelligent machine learning-enabled cattle reclining risk mitigation technique using surveillance videos",
+      "journal": "Neural Computing and Applications",
+      "date": "November 20, 2023",
+      "doi": "10.1007/s00521-023-09143-2",
+      "type": "Journal Article",
+      "keywords": ["Machine Learning", "Video Analytics", "Animal Welfare", "Risk Mitigation"],
+      "impact": "Springer Q1 journal",
+      "summary": "Applied ML to livestock monitoring, detecting when cattle are in dangerous reclining positions to prevent injury."
+    },
+    {
+      "title": "Artificial intelligence inspired IoT-fog based framework for generating early alerts while train passengers traveling in dangerous states using surveillance videos",
+      "journal": "Multimedia Tools and Applications",
+      "date": "July 7, 2023",
+      "doi": "10.1007/s11042-023-16107-0",
+      "type": "Journal Article",
+      "keywords": ["Passenger Safety", "Video Surveillance", "IoT", "Early Warning Systems"],
+      "summary": "Developed an AI system to detect dangerous passenger behaviors on trains and alert authorities in real-time."
+    },
+    {
+      "title": "Artificial intelligence inspired framework for preventing sexual violence at public toilets of educational institutions with the improvisation of gender recognition from gait sequences",
+      "journal": "Soft Computing",
+      "date": "April 30, 2023",
+      "doi": "10.1007/s00500-023-08285-8",
+      "type": "Journal Article",
+      "keywords": ["Safety Systems", "Gait Recognition", "Campus Security", "AI Ethics"],
+      "summary": "Built a privacy-preserving safety system using gait recognition to improve security at educational institutions."
+    },
+    {
+      "title": "Sustainable Development Goal for Quality Education (SDG 4): A study on SDG 4 to extract the pattern of association among the indicators of SDG 4 employing a genetic algorithm",
+      "journal": "Education and Information Technologies",
+      "date": "August 11, 2022",
+      "doi": "10.1007/s10639-022-11265-4",
+      "type": "Journal Article",
+      "keywords": ["SDG 4", "Quality Education", "Genetic Algorithms", "Pattern Analysis"],
+      "impact": "Springer Q1 journal",
+      "summary": "Applied genetic algorithms to analyze relationships between different educational indicators in the UN's Sustainable Development Goals."
+    },
+    {
+      "title": "An Exploration into Artificial intelligence based advancement in education field",
+      "conference": "2nd International Conference on Advance Computing and Innovative Technologies in Engineering (ICACITE)",
+      "date": "April 28, 2022",
+      "doi": "10.1109/icacite53722.2022.9823801",
+      "type": "Conference Paper",
+      "keywords": ["AI in Education", "EdTech", "Learning Analytics"],
+      "summary": "Survey paper exploring how AI is transforming education across different domains."
+    }
+  ],
+
+  "publicationStats": {
+    "total": 11,
+    "journals": 9,
+    "conferences": 2,
+    "q1Journals": 7,
+    "q2Journals": 2,
+    "firstAuthor": 2,
+    "citationAreas": [
+      "Artificial Intelligence and Machine Learning",
+      "Computer Vision and Image Processing",
+      "Internet of Things (IoT) and Smart Systems",
+      "Educational Technology and Learning Systems",
+      "Safety, Monitoring, and Surveillance Systems"
+    ],
+    "impactStatement": "My research emphasizes applied AI systems that transition from theoretical models to deployable solutions. The work targets real-world impact in safety-critical environments, educational platforms, and resource-constrained systems, balancing methodological rigor with practical applicability."
+  },
+
+
+  "volunteering": [
+    {
+      "role": "Microsoft Learn Student Ambassador",
+      "organization": "Microsoft",
+      "location": "India",
+      "period": "2023 - 2024",
+      "description": "Represented Microsoft on campus, organized tech workshops, and mentored students in cloud computing and AI technologies.",
+      "impact": "Trained 200+ students in Azure and AI services",
+      "whyItMatters": "I love teaching and this program let me help students learn cutting-edge cloud and AI technologies for free."
+    },
+    {
+      "role": "Head of Operations",
+      "organization": "CodeDay Amritsar",
+      "location": "India",
+      "period": "June 2023 - July 2023",
+      "description": "Led operations for a 24-hour coding event, managing logistics, mentors, and 100+ participants.",
+      "impact": "Successfully organized event with 100+ participants",
+      "challenge": "Coordinating a 24-hour hackathon with limited budget - learned a lot about event management!"
+    },
+    {
+      "role": "AIML Lead",
+      "organization": "Google Developer Student Clubs",
+      "location": "India",
+      "period": "2022 - 2023",
+      "description": "Led the AI/ML track, conducted workshops on machine learning, and mentored students in AI projects.",
+      "impact": "Conducted 15+ workshops, mentored 50+ students in ML projects",
+      "favorite": "Seeing students build their first ML models and deploy them - their excitement is contagious!"
+    },
+    {
+      "role": "Student Chapter Lead",
+      "organization": "GeeksforGeeks GNDU",
+      "location": "India",
+      "period": "2022 - 2024",
+      "description": "Founded and led the GeeksforGeeks student chapter, organizing coding competitions, tech talks, and placement preparation sessions.",
+      "impact": "Grew chapter to 500+ active members, helped 50+ students with placement prep",
+      "proudMoment": "Started from zero and built a thriving tech community on campus!"
+    }
+  ],
+
+  "memberships": [
+    {
+      "organization": "Institute of Engineers Bangladesh (IEB)",
+      "location": "Bangladesh",
+      "status": "Associate Member (Active)",
+      "type": "Professional",
+      "since": "2024"
+    },
+    {
+      "organization": "Society of Chittagong IT Professionals (SOCITP)",
+      "location": "Bangladesh",
+      "status": "Associate Member (Active)",
+      "type": "Professional",
+      "since": "2024"
+    },
+    {
+      "organization": "IEEE",
+      "membershipType": "Graduate Student Member",
+      "location": "Lithuania",
+      "status": "Active Member (2025)",
+      "type": "Professional",
+      "since": "2025"
+    }
+  ],
+
+  "researchInterests": [
+    "Artificial Intelligence and Machine Learning",
+    "Computer Vision and Image Processing",
+    "Internet of Things (IoT) and Fog Computing",
+    "Educational Technology and Smart Campuses",
+    "Safety and Surveillance Systems",
+    "Accessibility Solutions for Visually Impaired",
+    "Sustainable Development through Technology",
+    "Real-time Intelligent Systems",
+    "Deep Learning and Neural Networks",
+    "Video Analytics and Pattern Recognition",
+    "Edge Computing and Optimization",
+    "AI Ethics and Responsible AI"
+  ],
+
+  "projects": {
+    "summary": "My research projects have been published in top-tier journals and conferences. Key areas include AI-powered safety systems for educational institutions, assistive technology for visually impaired individuals, smart building emergency response systems, and intelligent transportation systems. Most projects involve real-time computer vision, IoT-fog computing architectures, and practical deployment considerations.",
+    
+    "highlighted": [
+      {
+        "name": "Visual Assistance Framework for Blind and Visually Impaired",
+        "description": "Developed a fog-cloud-based AI framework that provides real-time assistance to visually impaired individuals using computer vision and intelligent scene understanding.",
+        "technologies": ["Python", "Computer Vision", "Fog Computing", "Cloud Architecture", "Deep Learning"],
+        "impact": "Published in Multimedia Tools and Applications (Springer Q2)",
+        "year": "2024",
+        "why": "Accessibility is personal to me - technology should empower everyone, regardless of physical abilities."
+      },
+      {
+        "name": "Smart Campus Safety Systems",
+        "description": "Multiple AI-powered safety frameworks including offensive poster detection, gender recognition for restroom security, and emergency fire response systems for educational institutions.",
+        "technologies": ["Computer Vision", "IoT", "ML Models", "Real-time Processing"],
+        "impact": "3 journal publications in Cluster Computing and Soft Computing",
+        "year": "2023-2025",
+        "challenge": "Balancing security with privacy - used gait recognition instead of facial recognition to respect privacy."
+      },
+      {
+        "name": "Intelligent Transportation Systems",
+        "description": "Non-Latin license plate recognition system for industrial vehicle access control with energy-efficient real-time processing.",
+        "technologies": ["OCR", "Computer Vision", "Edge Computing", "Industrial IoT"],
+        "impact": "Published in International Journal of Intelligent Transportation Systems Research",
+        "year": "2025",
+        "innovation": "Handles multiple language scripts (Bengali, Hindi, etc.) which most systems don't support well."
+      },
+      {
+        "name": "AI-based Educator Feedback System",
+        "description": "Hand gesture recognition system that provides real-time feedback to educators during lectures.",
+        "technologies": ["Gesture Recognition", "Real-time ML", "Video Processing"],
+        "impact": "Published in Education and Information Technologies (Springer Q1)",
+        "year": "2025",
+        "insight": "Good teaching isn't just about content - body language matters too!"
+      }
+    ],
+    
+    "githubProjects": [
+      {
+        "name": "Disease Prediction App",
+        "description": "ML-powered web app that predicts diseases based on symptoms with 92% accuracy",
+        "technologies": ["Python", "Streamlit", "Scikit-learn"],
+        "status": "Public on GitHub"
+      },
+      {
+        "name": "Object Detection with YOLOv7",
+        "description": "Real-time object detection implementation achieving 51.2 mAP on COCO dataset",
+        "technologies": ["YOLOv7", "PyTorch", "OpenCV"],
+        "status": "Public on GitHub"
+      }
+    ]
+  },
+
+
+  "services": {
+    "offered": [
+      "End-to-End AI/ML System Design, Development, and Deployment",
+      "Computer Vision Solutions for Real-World Environments",
+      "AI Feasibility Assessment and Use-Case Validation",
+      "Business Process Analysis and Data-Driven Optimization",
+      "Database Architecture, Optimization, and Reporting",
+      "Data Visualization, Dashboards, and Decision Support Systems",
+      "IoT and Smart Systems Prototyping and Integration",
+      "AI Integration Consulting for Existing Software Products",
+      "Research Collaboration, Experiment Design, and Academic Writing",
+      "Python Development, Automation, and ML Pipelines",
+      "Requirements Engineering and Technical-Business Translation",
+      "Model Evaluation, Performance Analysis, and Risk Assessment"
+    ],
+
+    "approach": "I focus on solving the right problem before building a solution. My work typically starts with clarifying objectives, constraints, data availability, and success metrics. From there, I design solutions that are technically sound, economically justified, and practical to deploy. This allows me to operate effectively across research, engineering, and business-facing roles.",
+
+    "researchCollaboration": "I collaborate on applied and academic research in AI, computer vision, IoT, and educational technology. I contribute to problem formulation, experimental design, implementation, evaluation, and manuscript preparation. I am comfortable working under publication timelines, ethical review requirements, and shared IP agreements.",
+
+    "availability": "While pursuing my Master's degree (2025-2027), I am available for part-time consulting, freelance engagements, and research collaborations. I can work onsite as well as remotely across time zones and adapt my availability based on project scope and critical milestones.",
+
+    "workingStyle": "I work in a structured, transparent manner. I prioritize understanding constraints, documenting assumptions, and validating progress through iterative checkpoints. I adapt quickly to new domains and tools, communicate clearly with both technical and non-technical stakeholders, and focus on delivering solutions that are maintainable, explainable, and aligned with long-term goals."
+  },
+
+  "contact": {
+    "email": "eshansengupta2000@gmail.com",
+    "linkedin": "https://www.linkedin.com/in/eshansengupta",
+    "researchGate": "https://www.researchgate.net/profile/Eshan-Sengupta",
+    "googleScholar": "https://scholar.google.com/citations?user=-aVtavkAAAAJ&hl=en",
+    "orcid": "https://orcid.org/0000-0002-6285-7654",
+    "github": "https://github.com/atpugneSnahsE",
+    "facebook": "https://www.facebook.com/official.eshan.sengupta",
+    "instagram": "https://instagram.com/eshansengupta.me",
+    "location": "Vilnius, Lithuania",
+    "timezone": "EET (UTC+2)",
+    "preferredContact": "Email me at eshansengupta2000@gmail.com for the fastest response. I typically reply within 24-48 hours. For research inquiries, you can also connect with me on ResearchGate or Google Scholar.",
+    "responseTime": "Usually within 24-48 hours. If it's urgent, mention it in the subject line!"
+  },
+
+  "faq": [
+    {
+      "question": "What is your research focus?",
+      "answer": "My research is centered on applied artificial intelligence—specifically computer vision, IoT and fog/edge computing, and educational technology. The core theme across my work is translating AI from theory into systems that work reliably in real environments, particularly in safety, accessibility, and education. I prioritize practical impact over benchmark-only results.",
+      "variations": [
+        "what do you research",
+        "research areas",
+        "what is your main research domain",
+        "are you more applied or theoretical",
+        "what problems do you work on"
+      ]
+    },
+    {
+      "question": "How many research papers have you published?",
+      "answer": "I have published 11 research papers in international journals and conferences. This includes 9 journal publications and 2 conference papers, with multiple publications in Q1 and Q2 journals. My work spans AI/ML, computer vision, IoT, education, and safety systems, with a strong emphasis on applied research.",
+      "variations": [
+        "publications",
+        "how many papers have you published",
+        "research output",
+        "do you have journal publications",
+        "publication record"
+      ]
+    },
+    {
+      "question": "What programming languages and technical stack do you work with?",
+      "answer": "My primary language is Python, which I use extensively for AI/ML development, computer vision, data analysis, and automation. I also work with SQL and PL/SQL for database design, querying, and reporting. Across projects, I’m comfortable working end-to-end—from experimentation in notebooks to APIs, databases, and deployment pipelines.",
+      "variations": [
+        "what languages do you use",
+        "programming skills",
+        "technical stack",
+        "coding background",
+        "what are you strongest in technically"
+      ]
+    },
+    {
+      "question": "What types of roles are you open to?",
+      "answer": "I am open to internships, part-time roles, full-time positions, freelance projects, and research collaborations. The exact arrangement depends on scope, learning potential, and alignment with my skills and academic commitments. I’m flexible and open to structured discussions around role expectations.",
+      "variations": [
+        "what roles are you looking for",
+        "are you open to full time",
+        "internship availability",
+        "part time or contract",
+        "what kind of positions suit you"
+      ]
+    },
+    {
+      "question": "Are you available for freelance or consulting work?",
+      "answer": "Yes. I’m available for freelance, consulting, and project-based work, particularly in AI/ML development, computer vision, data analysis, business analysis, and research support. I prefer clearly scoped engagements with defined deliverables, but I’m flexible depending on project needs.",
+      "variations": [
+        "freelance availability",
+        "consulting work",
+        "can we hire you on contract",
+        "external consultant",
+        "project-based work"
+      ]
+    },
+    {
+      "question": "What is your experience with business analysis?",
+      "answer": "I have hands-on experience with business process mapping (BPMN 2.0), requirements gathering, gap analysis, stakeholder communication, KPI analysis, and UAT execution. I’ve worked in enterprise environments using tools such as Oracle EBS, Jira, and Azure DevOps, and I’m comfortable bridging business needs with technical implementation.",
+      "variations": [
+        "business analysis background",
+        "BA experience",
+        "process analysis",
+        "requirements engineering",
+        "working with stakeholders"
+      ]
+    },
+    {
+      "question": "Can you support academic research or publications?",
+      "answer": "Yes. I actively collaborate on academic research and publications. I can contribute to problem formulation, experimental design, implementation, result analysis, and manuscript writing. I’m familiar with the peer-review process and understand the balance between research rigor and practical contribution.",
+      "variations": [
+        "research collaboration",
+        "paper writing support",
+        "academic co-author",
+        "help with journal submissions",
+        "publishing experience"
+      ]
+    },
+    {
+      "question": "What is your background in computer vision?",
+      "answer": "My background in computer vision includes both research and applied development. I’ve published multiple papers covering object detection, gesture recognition, gait analysis, license plate recognition, and real-time video analytics. I work with PyTorch, TensorFlow, and OpenCV, and I focus on making CV systems robust in real-world conditions.",
+      "variations": [
+        "computer vision experience",
+        "cv background",
+        "image processing skills",
+        "vision-related projects",
+        "deep learning for vision"
+      ]
+    },
+    {
+      "question": "What tools do you use for data visualization and reporting?",
+      "answer": "For business and stakeholder-facing reporting, I primarily use Power BI. For analytical and custom visualization work, I use Python libraries such as Matplotlib, Seaborn, and Plotly. I choose tools based on audience, scale, and decision-making needs rather than preference alone.",
+      "variations": [
+        "data visualization tools",
+        "reporting experience",
+        "dashboard tools",
+        "bi tools",
+        "how do you present data"
+      ]
+    },
+    {
+      "question": "Do you have experience with Oracle systems?",
+      "answer": "Yes. I’ve worked with Oracle APEX for application development and Oracle E-Business Suite (EBS) in an enterprise manufacturing environment. I also use SQL and PL/SQL extensively for querying, reporting, and database-level logic.",
+      "variations": [
+        "oracle experience",
+        "oracle apex",
+        "oracle ebs",
+        "enterprise systems",
+        "erp exposure"
+      ]
+    },
+    {
+      "question": "Where are you based and how do you prefer to work?",
+      "answer": "I am currently based in Lithuania. I am open to remote work globally and onsite roles within Lithuania. My preference depends on the role and team setup, and I’m comfortable working in hybrid or fully onsite environments when based locally.",
+      "variations": [
+        "current location",
+        "where are you based",
+        "remote or onsite",
+        "can you work from office",
+        "location preference"
+      ]
+    },
+    {
+      "question": "Are you open to relocation?",
+      "answer": "At present, I am focused on opportunities in Lithuania and remote roles. Relocation discussions can be considered in the future, particularly after completing my Master’s degree, depending on role alignment and long-term fit.",
+      "variations": [
+        "relocation plans",
+        "willing to move",
+        "international roles",
+        "future relocation",
+        "location flexibility"
+      ]
+    },
+    {
+      "question": "Why should we hire you?",
+      "answer": "I combine strong AI/ML research experience with practical engineering and business analysis skills. This allows me to understand problems from both technical and organizational perspectives. I learn quickly, adapt to new domains, and focus on delivering solutions that are useful, scalable, and well-aligned with real requirements.",
+      "variations": [
+        "why should we hire you",
+        "what makes you a good fit",
+        "your strengths",
+        "why you over others",
+        "value you bring"
+      ]
+    },
+    {
+      "question": "What are your working hours and flexibility?",
+      "answer": "I’m flexible with working hours and can adapt to different time zones when needed. I generally prefer structured schedules, but I can accommodate evenings or weekends for critical deadlines or collaborative requirements.",
+      "variations": [
+        "working hours",
+        "availability",
+        "time zone flexibility",
+        "weekend work",
+        "schedule expectations"
+      ]
+    }
+  ], 
+
+  "achievements": [
+    "Authored 11 peer-reviewed research publications during undergraduate studies, spanning international journals and conferences in AI, computer vision, IoT, and educational technology",
+    "Published 3 papers in Q1-ranked journals (top 25% by impact and ranking within their respective fields)",
+    "Selected as a Microsoft Learn Student Ambassador (2023-2024), contributing to technical learning initiatives and community-driven education",
+    "Founded and led the GeeksforGeeks GNDU Student Chapter, growing the community to over 500 active members and organizing technical workshops and mentoring programs",
+    "Led the AI/ML track at Google Developer Student Clubs, coordinating learning sessions, projects, and peer mentorship in applied machine learning",
+    "Published research in internationally indexed journals with recognized impact factors in artificial intelligence and computing disciplines",
+    "Contributed to research aligned with Sustainable Development Goal 4 (Quality Education), focusing on technology-driven educational accessibility and effectiveness",
+    "Designed and implemented multiple AI-based frameworks targeting real-world safety, monitoring, and accessibility use cases",
+    "Active member of three professional engineering and technology organizations, maintaining engagement with industry and research communities",
+    "Mentored over 200 students in AI/ML, software development, and cloud-related technologies through workshops, community programs, and one-on-one guidance"
+  ],
+
+  "workingWith": {
+    "ideal": "I work best with people and organizations that value thoughtful problem-solving, research-backed decisions, and respectful collaboration. I enjoy environments where diversity of background, perspective, and identity is welcomed, and where people feel safe to contribute openly. I strongly support LGBTQIA+ rights and believe inclusive teams consistently produce better, more innovative outcomes. Whether the context is academic, enterprise, or startup-focused, I appreciate curiosity, transparency, and shared ownership of outcomes.",
+    
+    "process": "My working process is structured but adaptable. I begin by understanding the purpose, constraints, and success criteria before proposing solutions. From there, I move through analysis, design, implementation, and validation, with clear documentation at each stage. For research-oriented work, I follow scientific methodology and aim for reproducible, publishable results. For industry projects, I prioritize practicality, maintainability, and knowledge transfer. Iterative delivery with regular alignment works best for me.",
+    
+    "communication": "I value clear, respectful communication. Email works best for initial contact and detailed discussions, while video calls are ideal for project kickoffs and milestone reviews. I'm comfortable with asynchronous communication via tools like Slack or Teams and provide transparent progress updates. I typically respond within 24-48 hours and prefer setting expectations early to avoid ambiguity.",
+    
+    "notAGoodFit": "I may not be the best fit for environments that expect constant availability, lack respect for work-study balance, or prioritize speed over correctness and clarity. I also don't work well in cultures that dismiss inclusivity, diversity, or mutual respect. I believe strong results come from well-defined requirements, ethical practices, and teams that value people as much as outcomes."
+  },
+
+  "values": [
+    "Research excellence and academic integrity",
+    "Practical AI solutions that solve real problems",
+    "Ethical AI development and deployment",
+    "Knowledge sharing and mentorship",
+    "Continuous learning and skill development",
+    "Collaborative innovation",
+    "Sustainable technology for social good",
+    "Making technology accessible to everyone",
+    "Work-life balance (yes, even for researchers!)"
+  ],
+
+  "funFacts": [
+    "I've published my first research paper during my second year of undergraduate studies - caught the research bug early!",
+    "I'm fluent in multiple programming paradigms and love exploring new technologies (currently geeking out over LLMs)",
+    "I've mentored over 200+ students through various technical communities",
+    "My research has spanned from cattle welfare to campus safety - I believe AI should serve diverse needs, not just tech giants",
+    "I'm passionate about making technology accessible to everyone, especially through assistive AI systems",
+    "I can work across the full stack - from training neural networks to writing business requirement documents",
+    "I learned more from organizing hackathons than from some of my courses!",
+    "I'm a strong believer in open source and knowledge sharing - that's why I mentor so actively"
+  ],
+
+  "interestingQuestions": [
+    {
+      "question": "What's the coolest project you've worked on?",
+      "answer": "One of the most meaningful projects I've worked on is a visual assistance framework for visually impaired users. It combined real-time computer vision with fog–cloud computing to support navigation and scene understanding in real environments. It was challenging from both a systems and deployment perspective, and rewarding because the outcome directly improved accessibility. The work was later published in a Springer journal, which validated both its technical and social impact.",
+      "variations": [
+        "what project are you most proud of",
+        "what's your favorite project",
+        "any project that really stands out",
+        "most interesting thing you've built",
+        "what kind of work excites you the most"
+      ]
+    },
+    {
+      "question": "What's your biggest achievement?",
+      "answer": "Publishing 11 peer-reviewed research papers during my undergraduate studies is probably my biggest measurable achievement. Beyond the number, what matters more to me is that several of these works were published in high-quality journals and addressed real-world problems. Balancing research, leadership roles, and academics at the same time taught me discipline and long-term execution.",
+      "variations": [
+        "what are you most proud of",
+        "biggest accomplishment so far",
+        "what achievement defines you",
+        "career highlight",
+        "what sets you apart"
+      ]
+    },
+    {
+      "question": "What's the hardest technical problem you've solved?",
+      "answer": "One of the toughest problems I worked on was real-time license plate recognition for non-Latin scripts on edge devices. Most OCR systems are optimized for Latin characters and cloud environments. Supporting scripts like Bengali or Hindi while keeping latency and power consumption low required redesigning both the model pipeline and deployment strategy. It forced me to think beyond accuracy and focus on constraints.",
+      "variations": [
+        "hardest problem you've faced",
+        "most challenging technical task",
+        "toughest project technically",
+        "problem that really stretched you",
+        "complex system you've built"
+      ]
+    },
+    {
+      "question": "What motivates you professionally?",
+      "answer": "I'm motivated by building AI systems that actually work outside controlled environments. Seeing a model perform reliably in the real world—under noise, constraints, and imperfect data—is far more satisfying than achieving marginal benchmark improvements. Teaching and mentoring also motivate me; helping others grow reinforces my own understanding.",
+      "variations": [
+        "what drives you",
+        "why do you work in AI",
+        "what keeps you motivated",
+        "what do you enjoy most about your work",
+        "what excites you day to day"
+      ]
+    },
+    {
+      "question": "Where do you see yourself in five years?",
+      "answer": "In five years, I see myself deeply involved in advanced AI research, likely having completed or nearing completion of a PhD. I'm interested in roles that sit between research and impact—industry research labs, applied R&D teams, or academia with strong industry collaboration. Long term, I want to lead teams that build AI systems with clear societal value.",
+      "variations": [
+        "five year plan",
+        "long term goals",
+        "where are you headed",
+        "career direction",
+        "future aspirations"
+      ]
+    },
+    {
+      "question": "How would you describe your work style?",
+      "answer": "I work best in a structured but flexible setup. I like starting with clarity on goals and constraints, then iterating quickly with regular validation. I'm comfortable working independently, but I value collaboration when problems benefit from multiple perspectives. I document decisions and assumptions as I go, which helps both the team and future maintenance.",
+      "variations": [
+        "how do you like to work",
+        "working style",
+        "how do you approach problems",
+        "team or independent",
+        "what is it like to work with you"
+      ]
+    },
+    {
+      "question": "What technologies are you currently excited about?",
+      "answer": "I'm particularly interested in large language models from a systems and application perspective, not just prompt usage. Edge AI is another area I follow closely—deploying models on constrained devices forces better engineering decisions. I'm also curious about neuromorphic and energy-efficient computing as potential long-term shifts in how AI systems are built.",
+      "variations": [
+        "what tech excites you",
+        "what are you learning now",
+        "current interests",
+        "emerging technologies you follow",
+        "future of AI topics"
+      ]
+    },
+    {
+      "question": "Do you have a favorite paper or piece of research you've done?",
+      "answer": "One project I'm particularly fond of is an AI-assisted hand gesture feedback system for educators, published in Education and Information Technologies. It combined computer vision, real-time feedback, and pedagogical value. It's a good example of research that is both technically solid and genuinely useful.",
+      "variations": [
+        "favorite publication",
+        "paper you're most attached to",
+        "research you enjoyed most",
+        "best work you've done",
+        "which project would you showcase"
+      ]
+    }
+  ]
+
+}

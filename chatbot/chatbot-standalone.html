@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Core surfaces */
+            --primary: #faf7ef;        /* main background */
+            --secondary: #ffffff;      /* header + input surface */
+            --message-bg: #ffffff;     /* bot message bubble */
+            --user-message: #e23b2e;   /* user bubble / primary accent */
+            /* Text */
+            --text: #111111;
+            --text-dim: #6f6f6f;
+            /* Accents */
+            --accent: #e23b2e;
+            --accent-soft: rgba(226, 59, 46, 0.08);
+            /* Borders & dividers */
+            --border: #d6d3cc;
+            /* Scrollbar / subtle UI */
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Manrope', sans-serif;
+            background: var(--primary);
+            color: var(--text);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Header */
+        .chat-header {
+            background: linear-gradient(135deg, var(--accent) 0%, #0891b2 100%);
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 42px;
+            height: 42px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .header-text h3 {
+            font-size: 16px;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 2px;
+        }
+
+        .header-text p {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 500;
+        }
+
+        /* Messages */
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+        .message {
+            display: flex;
+            gap: 10px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .message.bot .message-avatar {
+            background: linear-gradient(135deg, var(--accent) 0%, #0891b2 100%);
+            color: white;
+        }
+
+        .message.user .message-avatar {
+            background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+            color: white;
+        }
+
+        .message-content {
+            max-width: 75%;
+            padding: 12px 16px;
+            border-radius: 16px;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        .message.bot .message-content {
+            background: var(--message-bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-bottom-left-radius: 4px;
+        }
+
+        .message.user .message-content {
+            background: var(--user-message);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        /* Typing */
+        .typing-indicator {
+            display: none;
+        }
+
+        .typing-indicator.active {
+            display: flex;
+        }
+
+        .typing-dots {
+            background: var(--message-bg);
+            border: 1px solid var(--border);
+            padding: 12px 16px;
+            border-radius: 16px;
+            display: flex;
+            gap: 4px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-dim);
+            animation: bounce 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: 0s; }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes bounce {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-8px); }
+        }
+
+        /* Input */
+        .chat-input-area {
+            padding: 16px 20px;
+            background: var(--secondary);
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: var(--primary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: var(--text);
+            font-family: 'Manrope', sans-serif;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .chat-input:focus {
+            border-color: var(--accent);
+        }
+
+        .send-btn {
+            background: linear-gradient(135deg, var(--accent) 0%, #0891b2 100%);
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            cursor: pointer;
+            color: white;
+            font-size: 18px;
+            transition: transform 0.2s;
+        }
+
+        .send-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Welcome */
+        .welcome-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-dim);
+        }
+
+        .welcome-message h4 {
+            font-size: 18px;
+            color: var(--text);
+            margin-bottom: 8px;
+            font-weight: 800;
+        }
+
+        .quick-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .quick-action-btn {
+            background: var(--message-bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            font-family: 'Manrope', sans-serif;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .quick-action-btn:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-header">
+        <div class="header-content">
+            <div class="avatar">ES</div>
+            <div class="header-text">
+                <h3>Eshan's AI Assistant</h3>
+                <p>Ask me anything!</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="chat-messages" id="chat-messages">
+        <div class="welcome-message">
+            <h4>👋 Hi there!</h4>
+            <p>I'm Eshan's AI assistant. Ask me about his research, experience, skills, and projects!</p>
+        </div>
+        
+        <div class="quick-actions">
+            <button class="quick-action-btn" onclick="askQuestion('Tell me about Eshan\'s research')">📚 Research</button>
+            <button class="quick-action-btn" onclick="askQuestion('What are his technical skills?')">💻 Skills</button>
+            <button class="quick-action-btn" onclick="askQuestion('Show me his publications')">📄 Publications</button>
+            <button class="quick-action-btn" onclick="askQuestion('What\'s his experience?')">💼 Experience</button>
+            <button class="quick-action-btn" onclick="askQuestion('How can I contact him?')">📧 Contact</button>
+        </div>
+
+        <div class="typing-indicator message bot" id="typing">
+            <div class="message-avatar">ES</div>
+            <div class="typing-dots">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="chat-input-area">
+        <input type="text" class="chat-input" id="input" placeholder="Type your question..." />
+        <button class="send-btn" id="send">➤</button>
+    </div>
+
+    <script src="chatbot.js"></script>
+</body>
+</html>
