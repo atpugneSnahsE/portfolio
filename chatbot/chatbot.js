@@ -14,7 +14,6 @@ class PortfolioChatbot {
   async init() {
     try {
       // Check if we are in production
-      // Check if we are in production
       if (
         window.location.hostname === "localhost" ||
         window.location.hostname === "127.0.0.1"
