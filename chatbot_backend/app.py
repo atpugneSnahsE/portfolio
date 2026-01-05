@@ -3,6 +3,9 @@ import glob
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import google.generativeai as genai
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+import hashlib
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -10,6 +13,18 @@ load_dotenv()
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
+
+# Rate Limiter Configuration
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["200 per day", "50 per hour"],
+    storage_uri="memory://"
+)
+
+# Simple In-Memory Cache
+RESPONSE_CACHE = {}
+MAX_CACHE_SIZE = 100
 
 # Configure Gemini
 api_key = os.getenv("GEMINI_API_KEY")
@@ -27,16 +42,14 @@ else:
     except Exception as e:
         print(f"Error listing models: {e}")
 
-# Global variable to store knowledge base
-KNOWLEDGE_BASE = ""
+# Global variable to store knowledge base chunks
+KNOWLEDGE_CHUNKS = {} # filename -> content
 
 def load_knowledge_base():
-    """Reads all markdown files from the ../chatbot directory and combines them."""
-    global KNOWLEDGE_BASE
-    kb_content = []
+    """Reads all markdown files from the ../chatbot directory and stores them as chunks."""
+    global KNOWLEDGE_CHUNKS
     
     # Path to the chatbot directory containing markdown files
-    # Assuming app.py is in /chatbot_backend/ and markdown files are in /chatbot/
     chatbot_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'chatbot')
     
     print(f"Loading knowledge base from: {chatbot_dir}")
@@ -48,18 +61,60 @@ def load_knowledge_base():
             with open(file_path, 'r', encoding='utf-8') as f:
                 filename = os.path.basename(file_path)
                 content = f.read()
-                kb_content.append(f"--- START FILE: {filename} ---\n{content}\n--- END FILE: {filename} ---\n")
-                print(f"Loaded: {filename}")
+                KNOWLEDGE_CHUNKS[filename] = content
+                print(f"Loaded chunk: {filename} ({len(content)} chars)")
         except Exception as e:
             print(f"Error reading {file_path}: {e}")
             
-    KNOWLEDGE_BASE = "\n".join(kb_content)
-    print(f"Knowledge base loaded. Total characters: {len(KNOWLEDGE_BASE)}")
+    print(f"Knowledge base loaded. Total chunks: {len(KNOWLEDGE_CHUNKS)}")
+
+def get_relevant_context(user_query):
+    """
+    Selects the most relevant chunks based on keyword overlap.
+    This is a lightweight alternative to embeddings (saves RAM for Render free tier).
+    """
+    query_tokens = set(user_query.lower().split())
+    
+    # Always include 'identity.md' if it exists, as it contains core persona info
+    selected_chunks = []
+    if 'identity.md' in KNOWLEDGE_CHUNKS:
+        selected_chunks.append(f"--- SOURCE: identity.md ---\n{KNOWLEDGE_CHUNKS['identity.md']}\n")
+        
+    # Score other chunks
+    scored_chunks = []
+    for filename, content in KNOWLEDGE_CHUNKS.items():
+        if filename == 'identity.md': continue
+        
+        # Simple score: count query words in the content
+        score = 0
+        content_lower = content.lower()
+        for token in query_tokens:
+            if len(token) > 3 and token in content_lower: # Ignore small stop words roughly
+                score += content_lower.count(token)
+        
+        if score > 0:
+            scored_chunks.append((score, filename, content))
+            
+    # Sort by score desc and take top 3
+    scored_chunks.sort(key=lambda x: x[0], reverse=True)
+    top_chunks = scored_chunks[:3]
+    
+    for score, fname, content in top_chunks:
+        print(f"Selected context: {fname} (Score: {score})")
+        selected_chunks.append(f"--- SOURCE: {fname} ---\n{content}\n")
+        
+    if not top_chunks and 'identity.md' not in KNOWLEDGE_CHUNKS:
+        # Fallback if nothing matches and identity is missing: send everything (careful with tokens)
+        # But for valid KB, usually identity.md exists.
+        pass
+        
+    return "\n".join(selected_chunks)
 
 # Load KB on startup
 load_knowledge_base()
 
 @app.route('/api/chat', methods=['POST'])
+@limiter.limit("5 per minute") # Rate limit: 5 requests per minute per IP
 def chat():
     if not api_key:
         return jsonify({"error": "Server configuration error: API key missing"}), 500
@@ -70,6 +125,14 @@ def chat():
     if not user_message:
         return jsonify({"error": "No message provided"}), 400
         
+    # Check Cache
+    # Create a simple hash of the normalized message
+    msg_hash = hashlib.md5(user_message.strip().lower().encode()).hexdigest()
+    
+    if msg_hash in RESPONSE_CACHE:
+        print(f"Cache hit for: {user_message[:20]}...")
+        return jsonify({"response": RESPONSE_CACHE[msg_hash]})
+        
     try:
         # Try available models in order of preference
         available_models = ['gemini-2.5-flash-lite', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-pro']
@@ -78,7 +141,7 @@ def chat():
         for m_name in available_models:
             try:
                 model = genai.GenerativeModel(m_name)
-                print(f"Successfully initialized model: {m_name}")
+                # print(f"Successfully initialized model: {m_name}") # Reduce log spam
                 break
             except Exception as e:
                 print(f"Failed to initialize {m_name}: {e}")
@@ -94,26 +157,43 @@ def chat():
         if not model:
             raise Exception("No suitable Gemini model found.")
         
+        # Get optimized context
+        relevant_context = get_relevant_context(user_message)
+        
         # Construct the prompt
         system_prompt = """
-        You are an AI assistant for Eshan Sengupta's portfolio website. 
-        Your goal is to answer questions about Eshan based ONLY on the provided context.
+        You are an AI assistant for Eshan Sengupta. Answer based ONLY on the provided context.
         
         Rules:
-        1. Use a professional but friendly tone.
-        2. If the answer is found in the context, synthesize it clearly.
-        3. If the answer is NOT in the context, politely say you don't know and suggest asking about his experience, research, or projects.
-        4. Keep answers concise (under 150 words) unless asked for details.
-        5. Do not hallucinate facts not present in the context.
+        1. BE EXTREMELY CONCISE. Max 2-3 sentences max unless asking for a list.
+        2. NO filler words ("Based on the context...", "I found..."). Go straight to the point.
+        3. Use bullet points for lists to save tokens.
+        4. If info is missing, say "I don't have that info."
+        5. STRICTLY NO HALLUCINATIONS.
         
-        Context Data about Eshan:
+        Context:
         """
         
-        full_prompt = f"{system_prompt}\n\n{KNOWLEDGE_BASE}\n\nUser Question: {user_message}"
+        full_prompt = f"{system_prompt}\n\n{relevant_context}\n\nUser Question: {user_message}"
         
-        response = model.generate_content(full_prompt)
+        # Configure generation to be compact
+        generation_config = genai.types.GenerationConfig(
+            max_output_tokens=150, # Limit response length strictly
+            temperature=0.7,
+        )
         
-        return jsonify({"response": response.text})
+        response = model.generate_content(full_prompt, generation_config=generation_config)
+        response_text = response.text.strip()
+        
+        # Update Cache
+        if len(RESPONSE_CACHE) >= MAX_CACHE_SIZE:
+            # Simple FIFO: remove first item (not perfect but simple)
+            first_key = next(iter(RESPONSE_CACHE))
+            del RESPONSE_CACHE[first_key]
+            
+        RESPONSE_CACHE[msg_hash] = response_text
+        
+        return jsonify({"response": response_text})
         
     except Exception as e:
         print(f"Error generating response: {e}")
