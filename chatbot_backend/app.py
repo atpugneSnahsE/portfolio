@@ -18,7 +18,7 @@ CORS(app)  # Enable CORS for all routes
 limiter = Limiter(
     get_remote_address,
     app=app,
-    default_limits=["200 per day", "50 per hour"],
+    default_limits=["200000 per day", "5000 per hour"],
     storage_uri="memory://"
 )
 
@@ -114,7 +114,7 @@ def get_relevant_context(user_query):
 load_knowledge_base()
 
 @app.route('/api/chat', methods=['POST'])
-@limiter.limit("5 per minute") # Rate limit: 5 requests per minute per IP
+@limiter.limit("25 per minute") # Rate limit: 5 requests per minute per IP
 def chat():
     if not api_key:
         return jsonify({"error": "Server configuration error: API key missing"}), 500
@@ -135,7 +135,7 @@ def chat():
         
     try:
         # Try available models in order of preference
-        available_models = ['gemini-2.5-flash-lite', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-pro']
+        available_models = ['gemini-2.5-flash-lite', 'gemini-2.0-flash']
         model = None
         
         for m_name in available_models:

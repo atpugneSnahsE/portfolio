@@ -3,5 +3,4 @@ flask-cors
 google-generativeai>=0.7.0
 python-dotenv
 gunicorn
-
 Flask-Limiter
