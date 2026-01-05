@@ -3,9 +3,8 @@ import glob
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import google.generativeai as genai
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 import hashlib
+import traceback
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -14,13 +13,8 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 
-# Rate Limiter Configuration
-limiter = Limiter(
-    get_remote_address,
-    app=app,
-    default_limits=["200000 per day", "5000 per hour"],
-    storage_uri="memory://"
-)
+# Rate Limiter Removed as per user request
+
 
 # Simple In-Memory Cache
 RESPONSE_CACHE = {}
@@ -114,7 +108,7 @@ def get_relevant_context(user_query):
 load_knowledge_base()
 
 @app.route('/api/chat', methods=['POST'])
-@limiter.limit("25 per minute") # Rate limit: 5 requests per minute per IP
+# @limiter.limit("25 per minute") - Removed
 def chat():
     if not api_key:
         return jsonify({"error": "Server configuration error: API key missing"}), 500
@@ -197,6 +191,7 @@ def chat():
         
     except Exception as e:
         print(f"Error generating response: {e}")
+        traceback.print_exc() # Print full stack trace to logs
         # Return the specific error to the frontend for debugging
         return jsonify({"error": str(e)}), 500
 
