@@ -1411,13 +1411,17 @@
         
         // Show button when page is scrolled down 300px
         window.addEventListener('scroll', () => {
-            const chatButton = document.getElementById('chatbot-toggle-standalone');
+            const chatButton = document.querySelector('.chatbot-toggler');
+            const chatWindow = document.querySelector('.chatbot');
+            
             if (window.pageYOffset > 300) {
                 backToTopButton.classList.add('show');
                 if (chatButton) chatButton.style.bottom = '90px';
+                if (chatWindow) chatWindow.style.bottom = '160px';
             } else {
                 backToTopButton.classList.remove('show');
-                if (chatButton) chatButton.style.bottom = '20px';
+                if (chatButton) chatButton.style.bottom = '24px';
+                if (chatWindow) chatWindow.style.bottom = '100px';
             }
         });
         
@@ -1532,12 +1536,39 @@
             });
         }
     });
-
-    // Load Smart Chatbot (Standalone Version - No CSS Conflicts)
-    const chatbotLoader = document.createElement('script');
-    chatbotLoader.src = 'chatbot/chatbot-loader.js';
-    document.head.appendChild(chatbotLoader);
-
 </script>
 
-<!-- Smart AI Chatbot will be injected by chatbot-loader.js -->
+    <!-- Chatbot Toggler -->
+    <button class="chatbot-toggler">
+        <span class="material-symbols-rounded"><i class="fas fa-comment"></i></span>
+        <span class="material-symbols-outlined"><i class="fas fa-times"></i></span>
+    </button>
+
+    <!-- Chatbot Interface -->
+    <div class="chatbot">
+        <header>
+            <h2>Eshan's AI Assistant</h2>
+            <span class="close-btn material-symbols-outlined"><i class="fas fa-times"></i></span>
+        </header>
+        <iframe src="chatbot/chatbot-standalone.html" style="width: 100%; height: 100%; border: none;" title="Chatbot"></iframe>
+    </div>
+    
+    <link rel="stylesheet" href="chatbot/chatbot.css">
+    
+    <script>
+        // Chatbot Toggler Logic
+        const chatbotToggler = document.querySelector('.chatbot-toggler');
+        const closeBtn = document.querySelector('.close-btn');
+
+        if (chatbotToggler) {
+            chatbotToggler.addEventListener('click', () => {
+                document.body.classList.toggle('show-chatbot');
+            });
+        }
+        
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                document.body.classList.remove('show-chatbot');
+            });
+        }
+    </script>
