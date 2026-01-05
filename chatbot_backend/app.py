@@ -17,6 +17,15 @@ if not api_key:
     print("Warning: GEMINI_API_KEY not found in environment variables")
 else:
     genai.configure(api_key=api_key)
+    
+    # List available models for debugging
+    try:
+        print("Available models:")
+        for m in genai.list_models():
+            if 'generateContent' in m.supported_generation_methods:
+                print(f" - {m.name}")
+    except Exception as e:
+        print(f"Error listing models: {e}")
 
 # Global variable to store knowledge base
 KNOWLEDGE_BASE = ""
@@ -62,7 +71,28 @@ def chat():
         return jsonify({"error": "No message provided"}), 400
         
     try:
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        # Try available models in order of preference
+        available_models = ['gemini-2.5-flash-lite', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-pro']
+        model = None
+        
+        for m_name in available_models:
+            try:
+                model = genai.GenerativeModel(m_name)
+                print(f"Successfully initialized model: {m_name}")
+                break
+            except Exception as e:
+                print(f"Failed to initialize {m_name}: {e}")
+                
+        if not model:
+            # Fallback to the first available content generation model found dynamically
+            for m in genai.list_models():
+                if 'generateContent' in m.supported_generation_methods:
+                    model = genai.GenerativeModel(m.name)
+                    print(f"Fallback to dynamic model: {m.name}")
+                    break
+        
+        if not model:
+            raise Exception("No suitable Gemini model found.")
         
         # Construct the prompt
         system_prompt = """
@@ -87,7 +117,8 @@ def chat():
         
     except Exception as e:
         print(f"Error generating response: {e}")
-        return jsonify({"error": "Failed to generate response"}), 500
+        # Return the specific error to the frontend for debugging
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5001))
