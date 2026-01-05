@@ -7,7 +7,7 @@ class PortfolioChatbot {
   constructor() {
     this.isInitialized = false;
     this.conversationHistory = [];
-    this.API_URL = "https://portfolio-wxry.onrender.com"; // Default local dev URL
+    this.API_URL = "https://portfolio-wxry.onrender.com/api/chat"; // Added /api/chat path
     this.init();
   }
 
@@ -18,9 +18,8 @@ class PortfolioChatbot {
         window.location.hostname !== "localhost" &&
         window.location.hostname !== "127.0.0.1"
       ) {
-        // Update this URL when you deploy the backend to Render
-        // this.API_URL = "https://your-app-name.onrender.com/api/chat";
-        console.warn("Please update API_URL for production deployment");
+        // The user hardcoded the base URL, but we need the full endpoint
+        // If the user replaces it, we want to ensure it has /api/chat
       }
 
       this.initializeUI();
@@ -48,6 +47,15 @@ class PortfolioChatbot {
         this.handleSendMessage();
       }
     });
+
+    // Quick action buttons
+    // The HTML has onclick="askQuestion(...)". We need to define this global function
+    // or attach listeners if we want to keep it contained.
+    // For now, let's expose specific method or handle it via delegation.
+    window.askQuestion = (question) => {
+      this.chatInput.value = question;
+      this.handleSendMessage();
+    };
   }
 
   async handleSendMessage() {
@@ -187,3 +195,8 @@ class PortfolioChatbot {
     }
   }
 }
+
+// Initialize the chatbot when the DOM is fully loaded
+document.addEventListener("DOMContentLoaded", () => {
+  window.chatbot = new PortfolioChatbot();
+});
