@@ -91,7 +91,8 @@ body.has-back-to-top .chatbot {
 
 /* Chat Header */
 .chatbot header {
-    background: linear-gradient(135deg, var(--accent) 0%, #d32f21 100%);
+    background: var(--accent);
+    border-bottom: 1px solid var(--rule);
     padding: 16px 20px;
     position: relative;
     text-align: center;

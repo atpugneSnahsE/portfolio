@@ -14,12 +14,16 @@ class PortfolioChatbot {
   async init() {
     try {
       // Check if we are in production
+      // Check if we are in production
       if (
-        window.location.hostname !== "localhost" &&
-        window.location.hostname !== "127.0.0.1"
+        window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1"
       ) {
-        // The user hardcoded the base URL, but we need the full endpoint
-        // If the user replaces it, we want to ensure it has /api/chat
+        this.API_URL = "http://127.0.0.1:5001/api/chat";
+        console.log("🔧 Running in development mode. API URL:", this.API_URL);
+      } else {
+        // Production URL
+        console.log("🚀 Running in production mode. API URL:", this.API_URL);
       }
 
       this.initializeUI();
