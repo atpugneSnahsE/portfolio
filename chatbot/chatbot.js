@@ -78,7 +78,18 @@ class PortfolioChatbot {
 
     // Process message and get response
     try {
+      // Set a warning timeout for 30 seconds
+      const timeoutWarningId = setTimeout(() => {
+        this.addMessage(
+          "⚠️ The model is powered by free resources. Due to resource constraints, initial load-up might take some time. Thanks for your patience!",
+          "bot"
+        );
+      }, 30000); // 30 seconds
+
       const response = await this.processMessage(message);
+
+      // Clear the warning timeout if response arrives in time
+      clearTimeout(timeoutWarningId);
 
       // Hide typing indicator
       this.hideTyping();
