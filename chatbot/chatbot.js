@@ -90,10 +90,19 @@ class PortfolioChatbot {
       });
     } catch (error) {
       this.hideTyping();
-      this.addMessage(
-        "Sorry, I encountered an error connecting to the AI server. Please make sure the backend is running.",
-        "bot"
-      );
+      let errorMessage =
+        "Sorry, I encountered an error connecting to the AI server.";
+
+      if (error.message.includes("Server returned")) {
+        errorMessage += ` (${error.message})`;
+      } else if (error.message === "Failed to fetch") {
+        errorMessage +=
+          " (Network Error: Backend might be sleeping or unreachable)";
+      } else {
+        errorMessage += ` (Details: ${error.message})`;
+      }
+
+      this.addMessage(errorMessage, "bot");
       console.error("Error processing message:", error);
     }
   }

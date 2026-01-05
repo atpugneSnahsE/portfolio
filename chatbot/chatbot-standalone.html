@@ -43,7 +43,8 @@
 
         /* Header */
         .chat-header {
-            background: linear-gradient(135deg, var(--accent) 0%, #0891b2 100%);
+            background: var(--bg-surface);
+            border-bottom: 1px solid var(--border);
             padding: 20px 24px;
             display: flex;
             justify-content: space-between;
@@ -133,12 +134,12 @@
         }
 
         .message.bot .message-avatar {
-            background: linear-gradient(135deg, var(--accent) 0%, #0891b2 100%);
+            background: var(--accent);
             color: white;
         }
 
         .message.user .message-avatar {
-            background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+            background: #6366f1;
             color: white;
         }
 
@@ -225,7 +226,7 @@
         }
 
         .send-btn {
-            background: linear-gradient(135deg, var(--accent) 0%, #0891b2 100%);
+            background: var(--accent);
             border: none;
             width: 44px;
             height: 44px;
@@ -282,15 +283,7 @@
     </style>
 </head>
 <body>
-    <div class="chat-header">
-        <div class="header-content">
-            <div class="avatar">ES</div>
-            <div class="header-text">
-                <h3>Eshan's AI Assistant</h3>
-                <p>Ask me anything!</p>
-            </div>
-        </div>
-    </div>
+    <!-- Header removed for embedded view -->
 
     <div class="chat-messages" id="chat-messages">
         <div class="welcome-message">
