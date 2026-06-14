@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+/* Required for Tailwind v4 dark mode */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Forest theme */
+@custom-variant forest (&:where(.forest, .forest *));
+
+html {
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+body {
+  min-height: 100vh;
+}
+
+/* Forest Mode */
+html.forest {
+  color-scheme: light;
+
+  /* subtle sage green */
+  background-color: #edf5ef;
+  color: #1f2937;
+}
+
+html.forest body {
+  background:
+    radial-gradient(circle at top,
+      rgba(16, 185, 129, 0.06),
+      transparent 45%),
+    #edf5ef;
+
+  color: #1f2937;
+}
