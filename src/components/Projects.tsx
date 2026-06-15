@@ -2,8 +2,7 @@ import Section from "./Section";
 import { getGithubProjects } from "@/lib/github";
 
 export default async function Projects() {
-  const projects =
-    await getGithubProjects();
+  const projects = await getGithubProjects();
 
   return (
     <Section title="Projects">
@@ -17,16 +16,20 @@ export default async function Projects() {
         </span>
       </div>
 
-      <div className="overflow-hidden">
+      {/* Prevent hover cut-off */}
+      <div className="overflow-visible pt-6">
         <div
           className="
             flex
             gap-6
             overflow-x-auto
+            overflow-y-visible
             scroll-smooth
-            pb-6
+            py-4
+            pb-8
             snap-x
             snap-mandatory
+            items-stretch
 
             scrollbar-thin
             scrollbar-thumb-zinc-700
@@ -34,26 +37,30 @@ export default async function Projects() {
           "
         >
           {projects.map(
-            (
-              project: any,
-              index: number
-            ) => (
+            (project: any, index: number) => (
               <div
                 key={index}
                 className="
                   group
                   min-w-[420px]
+                  max-w-[420px]
+                  min-h-[420px]
                   snap-center
+
+                  flex
+                  flex-col
+                  justify-between
 
                   rounded-[2rem]
                   border
                   p-8
                   transition-all
                   duration-500
+                  will-change-transform
 
                   border-zinc-200
                   bg-white/70
-                  hover:-translate-y-2
+                  hover:-translate-y-3
                   hover:border-emerald-500/40
                   hover:shadow-2xl
 
@@ -61,70 +68,63 @@ export default async function Projects() {
                   dark:bg-[#0B0C0E]
                 "
               >
-                <div className="mb-5 flex items-start justify-between gap-4">
-                  <div>
-                    <h3
-                      className="
-                        text-2xl
-                        font-semibold
+                {/* Top content */}
+                <div>
+                  <div className="mb-5 flex items-start justify-between gap-4">
+                    <div>
+                      <h3
+                        className="
+                          text-2xl
+                          font-semibold
+                          text-zinc-900
+                          dark:text-white
+                        "
+                      >
+                        {project.name}
+                      </h3>
+                    </div>
 
-                        text-zinc-900
-                        dark:text-white
-                      "
-                    >
-                      {project.name}
-                    </h3>
-
-                    <p className="mt-2 text-sm text-zinc-500">
-                      Updated{" "}
-                      {new Date(
-                        project.updatedAt
-                      ).toLocaleDateString()}
-                    </p>
+                    <span className="whitespace-nowrap rounded-full bg-emerald-500/10 px-3 py-1 text-sm text-emerald-500">
+                      ★ {project.stars}
+                    </span>
                   </div>
 
-                  <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-sm text-emerald-500">
-                    ★ {project.stars}
-                  </span>
-                </div>
-
-                <p
-                  className="
-                    mb-6
-                    min-h-[72px]
-                    leading-7
-                    text-zinc-600
-
-                    dark:text-zinc-400
-                  "
-                >
-                  {project.description}
-                </p>
-
-                <div className="mb-6 flex flex-wrap gap-2">
-                  <span
+                  <p
                     className="
-                      rounded-full
-                      border
-                      px-4 py-2
-                      text-sm
-
-                      border-zinc-300
-                      text-zinc-700
-
-                      dark:border-zinc-700
-                      dark:text-zinc-300
+                      mb-6
+                      min-h-[90px]
+                      leading-7
+                      text-zinc-600
+                      dark:text-zinc-400
                     "
                   >
-                    {project.language}
-                  </span>
+                    {project.description ||
+                      "No description available."}
+                  </p>
 
-                  {project.topics
-                    ?.slice(0, 3)
-                    .map(
-                      (
-                        topic: string
-                      ) => (
+                  <div className="mb-6 flex flex-wrap gap-2">
+                    {project.language && (
+                      <span
+                        className="
+                          rounded-full
+                          border
+                          px-4 py-2
+                          text-sm
+
+                          border-zinc-300
+                          text-zinc-700
+
+                          dark:border-zinc-700
+                          dark:text-zinc-300
+                        "
+                      >
+                        {project.language}
+                      </span>
+                    )}
+
+                    {project.topics
+                      ?.slice(0, 3)
+                      .map((topic: string) => (
                         <span
                           key={topic}
                           className="
@@ -138,11 +138,12 @@ export default async function Projects() {
                         >
                           {topic}
                         </span>
-                      )
-                    )}
+                      ))}
+                  </div>
                 </div>
 
-                <div className="flex gap-3">
+                {/* Bottom buttons */}
+                <div className="flex gap-3 pt-4">
                   <a
                     href={project.url}
                     target="_blank"
@@ -163,9 +164,7 @@ export default async function Projects() {
 
                   {project.homepage && (
                     <a
-                      href={
-                        project.homepage
-                      }
+                      href={project.homepage}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="

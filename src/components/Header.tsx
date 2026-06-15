@@ -1,5 +1,6 @@
+"use client";
+
 import ThemeToggle from "./ThemeToggle";
-import { Menu } from "lucide-react";
 
 export default function Header() {
   return (
@@ -37,44 +38,6 @@ export default function Header() {
         {/* Right Controls */}
         <div className="flex items-center gap-3">
           <ThemeToggle />
-
-          {/* Menu Button */}
-          <button
-            className="
-              group
-              flex
-              items-center
-              gap-2
-              rounded-2xl
-              border
-              border-zinc-300
-              bg-white/70
-              px-5
-              py-2.5
-              text-sm
-              font-medium
-              text-zinc-900
-              backdrop-blur-xl
-              transition-all
-              duration-300
-              hover:scale-105
-              hover:border-emerald-500
-              hover:text-emerald-500
-              dark:border-zinc-800
-              dark:bg-zinc-900/70
-              dark:text-white
-            "
-          >
-            <Menu
-              size={16}
-              className="
-                transition-transform
-                duration-300
-                group-hover:rotate-90
-              "
-            />
-            Menu
-          </button>
         </div>
       </div>
     </header>

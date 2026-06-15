@@ -19,18 +19,78 @@ body {
 /* Forest Mode */
 html.forest {
   color-scheme: light;
-
-  /* subtle sage green */
-  background-color: #edf5ef;
-  color: #1f2937;
+  background-color: #f2f7f4;
+  color: #113322;
 }
 
 html.forest body {
   background:
     radial-gradient(circle at top,
-      rgba(16, 185, 129, 0.06),
+      rgba(16, 185, 129, 0.12),
+      transparent 55%),
+    radial-gradient(circle at bottom right,
+      rgba(52, 211, 153, 0.05),
       transparent 45%),
-    #edf5ef;
+    #f2f7f4;
+  color: #113322;
+}
 
-  color: #1f2937;
+/* Override utility classes in forest mode to ensure a consistent greenish tint */
+html.forest main {
+  background-color: transparent !important;
+  color: #113322 !important;
+}
+
+/* Card components with sage-greenish translucency */
+html.forest .bg-white,
+html.forest .bg-white\/70,
+html.forest .bg-white\/60,
+html.forest .bg-white\/80 {
+  background-color: rgba(238, 247, 241, 0.8) !important;
+  border-color: rgba(16, 185, 129, 0.15) !important;
+  color: #113322 !important;
+}
+
+/* Inner elements / backgrounds */
+html.forest .bg-zinc-100\/60,
+html.forest .bg-zinc-100\/70,
+html.forest .bg-zinc-100,
+html.forest .bg-zinc-200 {
+  background-color: rgba(222, 238, 227, 0.7) !important;
+  border-color: rgba(16, 185, 129, 0.2) !important;
+}
+
+/* Borders */
+html.forest .border-zinc-200,
+html.forest .border-zinc-300 {
+  border-color: rgba(16, 185, 129, 0.15) !important;
+}
+
+/* Headers / Navigations */
+html.forest header {
+  background-color: rgba(242, 247, 244, 0.75) !important;
+  border-color: rgba(16, 185, 129, 0.12) !important;
+}
+
+/* Text elements */
+html.forest .text-black,
+html.forest .text-zinc-900,
+html.forest h1,
+html.forest h2,
+html.forest h3,
+html.forest h4 {
+  color: #0d281a !important;
+}
+
+html.forest .text-zinc-700,
+html.forest .text-zinc-600 {
+  color: #1b452e !important;
+}
+
+html.forest .text-zinc-500 {
+  color: #3b684f !important;
+}
+
+html.forest .text-emerald-500 {
+  color: #10b981 !important;
 }

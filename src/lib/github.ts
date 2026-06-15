@@ -5,6 +5,7 @@ type Repo = {
   homepage?: string;
   topics?: string[];
   stargazers_count: number;
+  pushed_at: string;
 };
 
 const USERNAME =
