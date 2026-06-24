@@ -1,364 +1,467 @@
 "use client";
+
+/* ------------------------------------------------------------------ *
+ *  Happy Mac — a love letter to the 1984 Macintosh                    *
+ * ------------------------------------------------------------------ *
+ *  Deps (in your app):
+ *    npm i three @react-three/fiber @react-three/drei @react-three/postprocessing
+ *
+ *  The <EffectComposer> block is self-contained — delete it and the
+ *  scene still renders (you just lose bloom/vignette).
+ *
+ *  Signature moment: the CRT "powers on" — the screen scales up from a
+ *  hairline with a brightness flash, then the Happy Mac fades in and
+ *  blinks occasionally. Everything else stays quiet on purpose.
+ * ------------------------------------------------------------------ */
+
 import { useRef, useMemo } from "react";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Canvas, useFrame } from "@react-three/fiber";
+import {
+  Environment,
+  Lightformer,
+  ContactShadows,
+  RoundedBox,
+  Float,
+} from "@react-three/drei";
+import { EffectComposer, Bloom, Vignette, SMAA } from "@react-three/postprocessing";
 import * as THREE from "three";
 
-function PlanetFace() {
-  const { pointer } = useThree();
-  const headRef = useRef<THREE.Group>(null);
-  const leftPupilRef = useRef<THREE.Mesh>(null);
-  const rightPupilRef = useRef<THREE.Mesh>(null);
-  const satellitesRef = useRef<THREE.Group>(null);
-  const cloudGroupRef = useRef<THREE.Group>(null);
+/* ---- design tokens ------------------------------------------------ */
+const BEIGE = "#e7e4d4";
+const BEIGE_LIGHT = "#efece0";
+const BEIGE_DARK = "#cfccb9";
+const BEIGE_SHADOW = "#b6b2a0";
+const PHOSPHOR_A = "#dcd9f4";
+const PHOSPHOR_B = "#a7a3d6";
+const INK = "#191921";
 
-  // Fresnel atmosphere glow (camera-facing rim light around the silhouette).
-  const atmosphereMat = useMemo(
-    () =>
-      new THREE.ShaderMaterial({
-        uniforms: { uColor: { value: new THREE.Color("#5fb0ff") } },
-        vertexShader: /* glsl */ `
-          varying vec3 vNormal;
-          void main() {
-            vNormal = normalize(normalMatrix * normal);
-            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-          }
-        `,
-        fragmentShader: /* glsl */ `
-          varying vec3 vNormal;
-          uniform vec3 uColor;
-          void main() {
-            float intensity = pow(0.62 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 3.2);
-            intensity = clamp(intensity, 0.0, 1.0);
-            gl_FragColor = vec4(uColor, 1.0) * intensity;
-          }
-        `,
-        side: THREE.BackSide,
-        blending: THREE.AdditiveBlending,
-        transparent: true,
-        depthWrite: false,
-      }),
-    []
-  );
+/* ================================================================== *
+ *  Screen content — phosphor lavender + crisp pixel Happy Mac face    *
+ * ================================================================== */
+function useScreen() {
+  return useMemo(() => {
+    const W = 512;
+    const H = 410;
+    const c = document.createElement("canvas");
+    c.width = W;
+    c.height = H;
+    const ctx = c.getContext("2d")!;
+
+    const draw = (blink: boolean) => {
+      const g = ctx.createLinearGradient(0, 0, 0, H);
+      g.addColorStop(0, PHOSPHOR_A);
+      g.addColorStop(0.55, "#bcb8e6");
+      g.addColorStop(1, PHOSPHOR_B);
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, W, H);
+
+      const glow = ctx.createRadialGradient(W / 2, 110, 20, W / 2, 110, 320);
+      glow.addColorStop(0, "rgba(255,255,255,0.22)");
+      glow.addColorStop(1, "rgba(255,255,255,0)");
+      ctx.fillStyle = glow;
+      ctx.fillRect(0, 0, W, H);
+
+      ctx.globalAlpha = 0.05;
+      ctx.fillStyle = "#000";
+      for (let y = 0; y < H; y += 3) ctx.fillRect(0, y, W, 1);
+      ctx.globalAlpha = 1;
+
+      // ---- pixel face (centered) ----
+      const px = (x: number, y: number, w: number, h: number) => ctx.fillRect(x, y, w, h);
+      ctx.fillStyle = INK;
+      const cx = W / 2;
+      const top = 120;
+
+      if (blink) {
+        px(cx - 120, top + 22, 56, 12);
+        px(cx + 64, top + 22, 56, 12);
+      } else {
+        px(cx - 120, top, 56, 56);
+        px(cx + 64, top, 56, 56);
+      }
+      // nose
+      px(cx - 14, top + 64, 30, 92);
+      px(cx - 62, top + 128, 48, 28);
+      // smile
+      px(cx - 118, top + 184, 34, 28);
+      px(cx - 86, top + 212, 172, 28);
+      px(cx + 84, top + 184, 34, 28);
+
+      // inner vignette so the tube reads as curved
+      const v = ctx.createRadialGradient(cx, H / 2, H * 0.25, cx, H / 2, H * 0.72);
+      v.addColorStop(0, "rgba(0,0,0,0)");
+      v.addColorStop(1, "rgba(20,16,40,0.45)");
+      ctx.fillStyle = v;
+      ctx.fillRect(0, 0, W, H);
+    };
+
+    draw(false);
+
+    const tex = new THREE.CanvasTexture(c);
+    tex.magFilter = THREE.NearestFilter;
+    tex.minFilter = THREE.LinearFilter;
+    tex.colorSpace = THREE.SRGBColorSpace;
+    tex.needsUpdate = true;
+    return { tex, draw };
+  }, []);
+}
+
+/* ================================================================== *
+ *  Rainbow six-color Apple logo                                       *
+ * ================================================================== */
+function useAppleTexture() {
+  return useMemo(() => {
+    const c = document.createElement("canvas");
+    c.width = 256;
+    c.height = 300;
+    const ctx = c.getContext("2d")!;
+    const apple = new Path2D(
+      "M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C32.3 141.2 0 184.8 0 244.7c0 24.5 4.5 49.8 13.5 75.9 12 34.4 55.3 118.9 100.5 117.5 23.6-.6 40.3-16.8 71-16.8 29.8 0 45.3 16.8 71.5 16.8 45.6-.7 84.8-77.5 96.2-112-61.1-28.8-58.9-84.4-58.9-85.4zm-52.5-156.5c25.3-30 23-57.3 22.3-67.1-22.4 1.3-48.3 15.3-63 32.5-16.2 18.5-25.7 41.4-23.7 65.9 24.2 1.9 46.3-10.5 64.4-31.3z"
+    );
+    ctx.save();
+    ctx.translate(18, 8);
+    ctx.scale(0.6, 0.6);
+    ctx.clip(apple);
+    const bands: [string, number, number][] = [
+      ["#5fb04a", 38, 70],
+      ["#f6b322", 108, 68],
+      ["#f08321", 176, 68],
+      ["#e23c3e", 244, 68],
+      ["#963d97", 312, 68],
+      ["#0a9ddd", 380, 80],
+    ];
+    bands.forEach(([col, y, h]) => {
+      ctx.fillStyle = col;
+      ctx.fillRect(-40, y, 470, h);
+    });
+    ctx.restore();
+    const tex = new THREE.CanvasTexture(c);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    tex.needsUpdate = true;
+    return tex;
+  }, []);
+}
+
+/* ================================================================== *
+ *  Geometry helpers                                                   *
+ * ================================================================== */
+
+// rounded rectangle path (centered at origin)
+function roundRect(p: THREE.Shape | THREE.Path, w: number, h: number, r: number) {
+  const x = -w / 2;
+  const y = -h / 2;
+  p.moveTo(x + r, y);
+  p.lineTo(x + w - r, y);
+  p.quadraticCurveTo(x + w, y, x + w, y + r);
+  p.lineTo(x + w, y + h - r);
+  p.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  p.lineTo(x + r, y + h);
+  p.quadraticCurveTo(x, y + h, x, y + h - r);
+  p.lineTo(x, y + r);
+  p.quadraticCurveTo(x, y, x + r, y);
+}
+
+// The iconic sloped case as an extruded, bevelled silhouette.
+// Returns the geometry AND its real front-face Z so we can mount the
+// screen/bezel/logo flush against it instead of guessing.
+function useCaseGeometry() {
+  return useMemo(() => {
+    const s = new THREE.Shape();
+    s.moveTo(-1.0, -1.62);
+    s.lineTo(1.0, -1.62);
+    s.lineTo(1.0, 1.28); // vertical front face
+    s.lineTo(0.62, 1.5);
+    s.lineTo(-0.86, 1.5);
+    s.lineTo(-1.0, 1.36);
+    s.lineTo(-1.0, -1.62);
+
+    const geo = new THREE.ExtrudeGeometry(s, {
+      depth: 2.32,
+      bevelEnabled: true,
+      bevelThickness: 0.07,
+      bevelSize: 0.07,
+      bevelSegments: 5,
+      steps: 1,
+      curveSegments: 8,
+    });
+    geo.rotateY(-Math.PI / 2);
+    geo.center();
+    geo.computeBoundingBox();
+    geo.computeVertexNormals();
+    const frontZ = geo.boundingBox!.max.z;
+    return { geo, frontZ };
+  }, []);
+}
+
+// Recessed bezel: an extruded rounded frame with a rounded hole.
+function useBezelGeometry() {
+  return useMemo(() => {
+    const shape = new THREE.Shape();
+    roundRect(shape, 2.0, 1.68, 0.13);
+    const hole = new THREE.Path();
+    roundRect(hole, 1.72, 1.4, 0.08);
+    shape.holes.push(hole);
+    const geo = new THREE.ExtrudeGeometry(shape, {
+      depth: 0.14,
+      bevelEnabled: true,
+      bevelThickness: 0.03,
+      bevelSize: 0.03,
+      bevelSegments: 3,
+      steps: 1,
+    });
+    geo.computeVertexNormals();
+    return geo;
+  }, []);
+}
+
+// Gently domed plane so the CRT reads as glass, not a sticker.
+function useCurvedPlane(w: number, h: number, bulge: number, seg = 24) {
+  return useMemo(() => {
+    const geo = new THREE.PlaneGeometry(w, h, seg, seg);
+    const p = geo.attributes.position;
+    for (let i = 0; i < p.count; i++) {
+      const nx = p.getX(i) / (w / 2);
+      const ny = p.getY(i) / (h / 2);
+      p.setZ(i, bulge * (1 - nx * nx) * (1 - ny * ny));
+    }
+    p.needsUpdate = true;
+    geo.computeVertexNormals();
+    return geo;
+  }, [w, h, bulge, seg]);
+}
+
+/* ================================================================== *
+ *  The Mac                                                            *
+ * ================================================================== */
+function HappyMac() {
+  const tilt = useRef<THREE.Group>(null);
+  const screenGroup = useRef<THREE.Group>(null);
+  const screenMat = useRef<THREE.MeshBasicMaterial>(null);
+  const ledMat = useRef<THREE.MeshStandardMaterial>(null);
+
+  const { geo: caseGeo, frontZ } = useCaseGeometry();
+  const bezelGeo = useBezelGeometry();
+  const screenGeo = useCurvedPlane(1.62, 1.32, 0.05);
+  const glassGeo = useCurvedPlane(1.7, 1.4, 0.08);
+  const { tex: screenTex, draw } = useScreen();
+  const appleTex = useAppleTexture();
+
+  // front-mount reference planes (relative to the real case face)
+  const FACE = frontZ + 0.002; // flush parts (logo, slot, seam)
+  const SY = 0.46; // screen vertical center
+
+  const start = useRef<number | null>(null);
+  const blink = useRef({ on: false, next: 2.5 });
 
   useFrame((state) => {
     const t = state.clock.getElapsedTime();
+    if (start.current === null) start.current = t;
+    const age = t - start.current;
 
-    // 1. Smooth head tracking
-    if (headRef.current) {
-      const targetX = -pointer.y * 0.09;
-      const targetY = pointer.x * 0.09;
-      headRef.current.rotation.x = THREE.MathUtils.lerp(headRef.current.rotation.x, targetX, 0.08);
-      headRef.current.rotation.y = THREE.MathUtils.lerp(headRef.current.rotation.y, targetY, 0.08);
-      headRef.current.position.y = Math.sin(t * 1.2) * 0.0025;
+    if (tilt.current) {
+      const tx = -state.pointer.y * 0.1;
+      const ty = state.pointer.x * 0.22;
+      tilt.current.rotation.x = THREE.MathUtils.lerp(tilt.current.rotation.x, tx, 0.06);
+      tilt.current.rotation.y = THREE.MathUtils.lerp(tilt.current.rotation.y, ty, 0.06);
     }
 
-    // 2. Pupil tracking
-    const pupilX = pointer.x * 0.03;
-    const pupilY = pointer.y * 0.03;
-    [leftPupilRef.current, rightPupilRef.current].forEach((eye) => {
-      if (!eye) return;
-      eye.position.x = THREE.MathUtils.lerp(eye.position.x, pupilX, 0.12);
-      eye.position.y = THREE.MathUtils.lerp(eye.position.y, pupilY, 0.12);
-    });
-
-    // 3. Tilted, slowly precessing orbital plane (kept tight so sats stay in frame)
-    if (satellitesRef.current) {
-      satellitesRef.current.rotation.y += 0.0009;
-      satellitesRef.current.rotation.x = 0.32 + Math.sin(t * 0.2) * 0.025;
+    // CRT power-on: scale up from a hairline with an overshoot
+    if (screenGroup.current) {
+      const k = THREE.MathUtils.clamp((age - 0.35) / 0.55, 0, 1);
+      const eased = k < 1 ? 1 - Math.pow(1 - k, 3) : 1;
+      const overshoot = 1 + Math.sin(k * Math.PI) * 0.06;
+      screenGroup.current.scale.y = Math.max(0.012, eased * overshoot);
+      screenGroup.current.scale.x = THREE.MathUtils.lerp(0.985, 1, eased);
     }
 
-    // 4. Global cloud rotation + independent drift per child
-    if (cloudGroupRef.current) {
-      cloudGroupRef.current.rotation.y = t * 0.015;
-      const c = cloudGroupRef.current.children;
-      if (c[0]) c[0].position.x = -0.35 + Math.sin(t * 0.4) * 0.03;
-      if (c[1]) c[1].position.y = 0.55 + Math.cos(t * 0.3) * 0.02;
-      if (c[2]) c[2].position.x = -0.65 + Math.sin(t * 0.5) * 0.04;
-      if (c[3]) c[3].position.y = -0.75 + Math.cos(t * 0.4) * 0.03;
-      if (c[4]) c[4].position.x = 0.7 + Math.sin(t * 0.3) * 0.02;
+    // brightness: power-on flash, then gentle breathing + flicker
+    if (screenMat.current) {
+      const flash = age < 0.35 ? 0 : age < 0.5 ? 1.3 : 1;
+      const breathe = 0.95 + Math.sin(t * 2.1) * 0.015;
+      const flicker = Math.random() < 0.015 ? -0.05 : 0;
+      screenMat.current.color.setScalar(flash * breathe + flicker);
     }
-  });
 
-  return (
-    <group ref={headRef} scale={1.2}>
-      {/* Fresnel atmosphere */}
-      <mesh scale={1.16}>
-        <sphereGeometry args={[0.95, 64, 64]} />
-        <primitive object={atmosphereMat} attach="material" />
-      </mesh>
+    // blink
+    if (age > 1) {
+      const b = blink.current;
+      if (!b.on && t > b.next) {
+        b.on = true;
+        draw(true);
+        screenTex.needsUpdate = true;
+        b.next = t + 0.12;
+      } else if (b.on && t > b.next) {
+        b.on = false;
+        draw(false);
+        screenTex.needsUpdate = true;
+        b.next = t + 2.5 + Math.random() * 3.5;
+      }
+    }
 
-      {/* Inner haze */}
-      <mesh scale={1.045}>
-        <sphereGeometry args={[0.95, 64, 64]} />
-        <meshBasicMaterial color="#bae6fd" transparent opacity={0.06} side={THREE.BackSide} />
-      </mesh>
-
-      {/* Ocean */}
-      <mesh castShadow receiveShadow>
-        <sphereGeometry args={[0.95, 96, 96]} />
-        <meshStandardMaterial color="#1c6fb5" roughness={0.5} metalness={0.18} />
-      </mesh>
-
-      {/* Continents */}
-      <Continent position={[-0.52, 0.32, 0.72]} scale={[0.32, 0.19, 0.055]} rotation={[0.25, 0.55, 0.1]} color="#2f9e44" />
-      <Continent position={[0.48, 0.05, 0.78]} scale={[0.27, 0.21, 0.045]} rotation={[0.15, -0.45, -0.1]} color="#51cf66" />
-      <Continent position={[0.1, -0.65, 0.68]} scale={[0.35, 0.18, 0.05]} rotation={[0.6, 0.2, 0.15]} color="#8ce99a" />
-      <Continent position={[-0.68, -0.28, 0.62]} scale={[0.19, 0.14, 0.04]} rotation={[0.3, 0.35, -0.2]} color="#2f9e44" />
-      <Continent position={[0.65, -0.45, 0.55]} scale={[0.12, 0.09, 0.03]} rotation={[0.4, -0.6, 0]} color="#51cf66" />
-      <Continent position={[-0.25, 0.65, 0.55]} scale={[0.16, 0.11, 0.035]} rotation={[-0.2, 0.8, 0.1]} color="#8ce99a" />
-
-      {/* Drifting clouds */}
-      <group ref={cloudGroupRef}>
-        <group position={[-0.35, 0.75, 0.82]}><Cloud scale={1.1} /></group>
-        <group position={[0.48, 0.55, 0.79]}><Cloud scale={0.85} /></group>
-        <group position={[-0.65, -0.4, 0.85]}><Cloud scale={0.65} /></group>
-        <group position={[0.22, -0.75, 0.78]}><Cloud scale={0.9} /></group>
-        <group position={[0.7, 0.25, 0.65]}><Cloud scale={0.55} /></group>
-      </group>
-
-      {/* Face */}
-      <Eye position={[-0.24, 0.15, 0.86]} pupilRef={leftPupilRef} />
-      <Eye position={[0.24, 0.15, 0.86]} pupilRef={rightPupilRef} />
-      <Eyebrow position={[-0.24, 0.39, 0.88]} rotation={0.25} />
-      <Eyebrow position={[0.24, 0.39, 0.88]} rotation={-0.22} />
-
-      <mesh position={[0, -0.23, 0.89]} rotation={[0.1, 0, Math.PI]}>
-        <torusGeometry args={[0.17, 0.023, 18, 120, Math.PI * 0.78]} />
-        <meshStandardMaterial color="#0f766e" roughness={0.6} />
-      </mesh>
-
-      <mesh position={[-0.41, -0.03, 0.82]}>
-        <circleGeometry args={[0.085, 48]} />
-        <meshBasicMaterial color="#fda4af" transparent opacity={0.2} />
-      </mesh>
-      <mesh position={[0.41, -0.03, 0.82]}>
-        <circleGeometry args={[0.085, 48]} />
-        <meshBasicMaterial color="#fda4af" transparent opacity={0.2} />
-      </mesh>
-
-      {/* Satellites on a tilted, tight orbit */}
-      <group ref={satellitesRef} rotation={[0.32, 0, 0.42]}>
-        <OrbitingSatellite angle={0} bodyColor="#caa45a" distance={1.12} speedMod={0.9} />
-        <OrbitingSatellite angle={Math.PI} bodyColor="#cdd2d8" distance={1.26} speedMod={0.72} />
-
-        {/* Faint orbit traces */}
-        <mesh rotation={[Math.PI / 2, 0, 0]}>
-          <torusGeometry args={[1.12, 0.0035, 8, 140]} />
-          <meshBasicMaterial color="#7dd3fc" transparent opacity={0.09} />
-        </mesh>
-        <mesh rotation={[Math.PI / 2, 0, 0]}>
-          <torusGeometry args={[1.26, 0.0035, 8, 140]} />
-          <meshBasicMaterial color="#7dd3fc" transparent opacity={0.07} />
-        </mesh>
-      </group>
-    </group>
-  );
-}
-
-function Eye({ position, pupilRef }: { position: [number, number, number]; pupilRef: React.RefObject<THREE.Mesh | null> }) {
-  return (
-    <group position={position}>
-      <mesh>
-        <sphereGeometry args={[0.175, 48, 48]} />
-        <meshStandardMaterial color="#f8fafc" roughness={0.2} />
-      </mesh>
-      <mesh ref={pupilRef} position={[0, 0, 0.115]}>
-        <sphereGeometry args={[0.082, 36, 36]} />
-        <meshStandardMaterial color="#1e293b" roughness={0.25} />
-        <mesh position={[0.025, 0.028, 0.055]}>
-          <sphereGeometry args={[0.019, 20, 20]} />
-          <meshStandardMaterial color="#f1f5f9" roughness={0.1} />
-        </mesh>
-      </mesh>
-    </group>
-  );
-}
-
-function Eyebrow({ position, rotation }: { position: [number, number, number]; rotation: number }) {
-  return (
-    <mesh position={position} rotation={[0, 0, rotation]}>
-      <torusGeometry args={[0.125, 0.022, 10, 32, Math.PI * 0.72]} />
-      <meshStandardMaterial color="#134e4a" roughness={0.6} />
-    </mesh>
-  );
-}
-
-function Cloud({ scale = 1 }: { scale?: number }) {
-  return (
-    <group scale={scale}>
-      <mesh>
-        <sphereGeometry args={[0.085, 24, 24]} />
-        <meshStandardMaterial color="#f0f9ff" roughness={0.95} transparent opacity={0.92} />
-      </mesh>
-      <mesh position={[0.09, 0.01, 0.02]}>
-        <sphereGeometry args={[0.065, 22, 22]} />
-        <meshStandardMaterial color="#f0f9ff" roughness={0.95} transparent opacity={0.88} />
-      </mesh>
-      <mesh position={[-0.08, 0.03, -0.01]}>
-        <sphereGeometry args={[0.055, 20, 20]} />
-        <meshStandardMaterial color="#f0f9ff" roughness={0.95} transparent opacity={0.85} />
-      </mesh>
-    </group>
-  );
-}
-
-function Continent({ position, rotation, scale, color = "#4ade80" }: {
-  position: [number, number, number];
-  rotation: [number, number, number];
-  scale: [number, number, number];
-  color?: string;
-}) {
-  return (
-    <mesh position={position} rotation={rotation} scale={scale}>
-      <sphereGeometry args={[1, 32, 32]} />
-      <meshStandardMaterial color={color} roughness={0.9} />
-    </mesh>
-  );
-}
-
-function OrbitingSatellite({ angle, bodyColor, distance = 2, speedMod = 1 }: {
-  angle: number; bodyColor: string; distance?: number; speedMod?: number;
-}) {
-  const groupRef = useRef<THREE.Group>(null);
-
-  useFrame((state) => {
-    if (groupRef.current) {
-      const t = state.clock.getElapsedTime();
-      groupRef.current.rotation.y = t * 0.45 * speedMod + angle;
-      groupRef.current.rotation.z = Math.sin(t * 1.1) * 0.05;
+    if (ledMat.current) {
+      ledMat.current.emissiveIntensity = 1.4 + Math.sin(t * 1.6) * 0.35;
     }
   });
 
   return (
-    <group ref={groupRef}>
-      <group position={[Math.cos(angle) * distance, Math.sin(angle) * 0.18, Math.sin(angle) * distance]}>
-        <Satellite bodyColor={bodyColor} />
+    <Float speed={1.3} rotationIntensity={0.15} floatIntensity={0.35} floatingRange={[-0.08, 0.12]}>
+      <group ref={tilt} scale={0.9} position={[0, 0.13, 0]}>
+        {/* base / foot */}
+        <RoundedBox
+          args={[2.22, 0.42, 1.86]}
+          radius={0.09}
+          smoothness={4}
+          position={[0, -1.74, -0.04]}
+          castShadow
+          receiveShadow
+        >
+          <meshStandardMaterial color={BEIGE_DARK} roughness={0.85} envMapIntensity={0.4} />
+        </RoundedBox>
+
+        {/* main case */}
+        <mesh geometry={caseGeo} castShadow receiveShadow>
+          <meshStandardMaterial
+            color={BEIGE}
+            roughness={0.66}
+            metalness={0.02}
+            envMapIntensity={0.45}
+          />
+        </mesh>
+
+        {/* dark CRT cavity seen through the bezel hole */}
+        <mesh position={[0, SY, FACE + 0.01]}>
+          <planeGeometry args={[1.78, 1.46]} />
+          <meshStandardMaterial color="#141319" roughness={0.5} metalness={0.2} />
+        </mesh>
+
+        {/* screen + glass — this group "powers on" */}
+        <group ref={screenGroup} position={[0, SY, FACE]}>
+          <mesh geometry={screenGeo} position={[0, 0, 0.04]}>
+            <meshBasicMaterial ref={screenMat} map={screenTex} toneMapped={false} />
+          </mesh>
+          <mesh geometry={glassGeo} position={[0, 0, 0.085]}>
+            <meshPhysicalMaterial
+              transparent
+              opacity={0.14}
+              color="#0c0c12"
+              roughness={0.05}
+              metalness={0}
+              clearcoat={1}
+              clearcoatRoughness={0.07}
+              ior={1.45}
+              envMapIntensity={1.4}
+            />
+          </mesh>
+        </group>
+
+        {/* raised recessed bezel (frame with a hole) */}
+        <mesh geometry={bezelGeo} position={[0, SY, FACE]} castShadow>
+          <meshStandardMaterial color={BEIGE_LIGHT} roughness={0.6} envMapIntensity={0.5} />
+        </mesh>
+
+        {/* seam below the screen */}
+        <mesh position={[0, -0.62, FACE]}>
+          <boxGeometry args={[2.04, 0.018, 0.02]} />
+          <meshStandardMaterial color={BEIGE_SHADOW} roughness={0.85} />
+        </mesh>
+
+        {/* floppy slot */}
+        <mesh position={[0.36, -0.96, FACE]}>
+          <boxGeometry args={[0.96, 0.08, 0.06]} />
+          <meshStandardMaterial color="#1c1c22" roughness={0.6} />
+        </mesh>
+
+        {/* power LED */}
+        <mesh position={[-0.74, -0.96, FACE + 0.01]}>
+          <sphereGeometry args={[0.028, 16, 16]} />
+          <meshStandardMaterial
+            ref={ledMat}
+            color="#bff6c4"
+            emissive="#5fe07a"
+            emissiveIntensity={1.5}
+            toneMapped={false}
+          />
+        </mesh>
+
+        {/* rainbow Apple logo */}
+        <mesh position={[-0.74, -1.02, FACE + 0.005]}>
+          <planeGeometry args={[0.32, 0.38]} />
+          <meshBasicMaterial map={appleTex} transparent toneMapped={false} />
+        </mesh>
       </group>
-    </group>
+    </Float>
   );
 }
 
-function SolarWing({ side }: { side: number }) {
-  const dir = side; // -1 left, +1 right
-  const seams = [-0.2, -0.1, 0, 0.1, 0.2];
-  return (
-    <group position={[dir * 0.66, 0, 0]}>
-      {/* deployment boom */}
-      <mesh position={[-dir * 0.26, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
-        <cylinderGeometry args={[0.014, 0.014, 0.34, 10]} />
-        <meshStandardMaterial color="#aeb6bf" metalness={0.8} roughness={0.35} />
-      </mesh>
-      {/* metallic backing frame */}
-      <mesh position={[0, 0, -0.008]}>
-        <boxGeometry args={[0.63, 0.37, 0.008]} />
-        <meshStandardMaterial color="#c7ccd2" metalness={0.85} roughness={0.3} />
-      </mesh>
-      {/* photovoltaic panel */}
-      <mesh castShadow>
-        <boxGeometry args={[0.6, 0.34, 0.012]} />
-        <meshStandardMaterial color="#15244a" metalness={0.45} roughness={0.3} emissive="#0a1840" emissiveIntensity={0.35} />
-      </mesh>
-      {/* cell seams */}
-      {seams.map((sx, i) => (
-        <mesh key={i} position={[sx, 0, 0.009]}>
-          <boxGeometry args={[0.004, 0.34, 0.002]} />
-          <meshStandardMaterial color="#2b4a8c" metalness={0.5} roughness={0.4} />
-        </mesh>
-      ))}
-      <mesh position={[0, 0, 0.009]}>
-        <boxGeometry args={[0.6, 0.004, 0.002]} />
-        <meshStandardMaterial color="#2b4a8c" metalness={0.5} roughness={0.4} />
-      </mesh>
-    </group>
-  );
-}
-
-function Satellite({ bodyColor = "#caa45a" }: { bodyColor?: string }) {
-  return (
-    <group scale={0.2}>
-      {/* Main bus wrapped in thermal foil */}
-      <mesh castShadow receiveShadow>
-        <boxGeometry args={[0.42, 0.46, 0.42]} />
-        <meshStandardMaterial color={bodyColor} metalness={0.92} roughness={0.42} />
-      </mesh>
-      {/* foil seam on front face */}
-      <mesh position={[0, 0, 0.212]}>
-        <boxGeometry args={[0.42, 0.46, 0.004]} />
-        <meshStandardMaterial color={bodyColor} metalness={0.6} roughness={0.65} />
-      </mesh>
-      {/* dark equipment band */}
-      <mesh position={[0, -0.16, 0]}>
-        <boxGeometry args={[0.44, 0.07, 0.44]} />
-        <meshStandardMaterial color="#2c2c30" metalness={0.5} roughness={0.6} />
-      </mesh>
-
-      {/* Solar wings */}
-      <SolarWing side={-1} />
-      <SolarWing side={1} />
-
-      {/* High-gain dish */}
-      <group position={[0, 0.12, 0.3]} rotation={[Math.PI / 2.4, 0, 0]}>
-        <mesh>
-          <cylinderGeometry args={[0.17, 0.05, 0.07, 28, 1, true]} />
-          <meshStandardMaterial color="#eef1f4" metalness={0.35} roughness={0.45} side={THREE.DoubleSide} />
-        </mesh>
-        {/* feed horn */}
-        <mesh position={[0, 0.12, 0]}>
-          <cylinderGeometry args={[0.012, 0.02, 0.12, 10]} />
-          <meshStandardMaterial color="#9aa3ad" metalness={0.7} roughness={0.4} />
-        </mesh>
-      </group>
-
-      {/* Omni antenna mast */}
-      <mesh position={[0, 0.34, -0.06]}>
-        <cylinderGeometry args={[0.008, 0.008, 0.3, 8]} />
-        <meshStandardMaterial color="#7c858f" metalness={0.6} roughness={0.4} />
-      </mesh>
-      <mesh position={[0, 0.5, -0.06]}>
-        <sphereGeometry args={[0.022, 12, 12]} />
-        <meshStandardMaterial color="#cfd4da" metalness={0.6} roughness={0.3} />
-      </mesh>
-
-      {/* Rear thruster nozzle */}
-      <mesh position={[0, -0.26, 0]}>
-        <cylinderGeometry args={[0.04, 0.07, 0.08, 16, 1, true]} />
-        <meshStandardMaterial color="#3a3a3e" metalness={0.6} roughness={0.5} side={THREE.DoubleSide} />
-      </mesh>
-    </group>
-  );
-}
-
+/* ================================================================== *
+ *  Scene                                                              *
+ * ================================================================== */
 export default function VesselCanvas() {
   return (
-    <div className="relative h-[480px] w-full overflow-visible bg-transparent">
-      <div className="absolute left-1/2 top-1/2 h-[320px] w-[320px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-cyan-400/5 blur-[100px]" />
+    <div className="relative h-[500px] w-full overflow-hidden">
+      <div
+        className="pointer-events-none absolute left-1/2 top-1/2 h-[360px] w-[360px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[110px]"
+        style={{
+          background:
+            "radial-gradient(circle at 50% 40%, rgba(196,176,255,0.28), rgba(255,210,140,0.08) 60%, transparent 75%)",
+        }}
+      />
 
       <Canvas
         dpr={[1, 2]}
-        camera={{ position: [0, 0, 4.8], fov: 42 }}
-        shadows={{ type: THREE.PCFSoftShadowMap }}
+        shadows
+        camera={{ position: [0, 0, 6.6], fov: 36 }}
         gl={{
-          antialias: true,
+          antialias: false,
           alpha: true,
           toneMapping: THREE.ACESFilmicToneMapping,
-          toneMappingExposure: 1.05,
+          toneMappingExposure: 1.0,
         }}
       >
-        <ambientLight intensity={0.6} />
+        <ambientLight intensity={0.5} />
+        <directionalLight
+          position={[4, 5.5, 6]}
+          intensity={1.7}
+          castShadow
+          shadow-mapSize={[2048, 2048]}
+          shadow-bias={-0.0002}
+        />
+        <directionalLight position={[-4, -1, -3]} intensity={0.45} color="#bfe2ff" />
+        <directionalLight position={[0, 2, -6]} intensity={0.9} color="#ffe6c2" />
 
-        {/* Key light */}
-        <directionalLight position={[4, 5, 6]} intensity={2.2} castShadow shadow-mapSize={[2048, 2048]} />
+        {/* reflections (no external HDRI / no network) */}
+        <Environment resolution={256} frames={1}>
+          <color attach="background" args={["#141019"]} />
+          <Lightformer form="rect" intensity={1.6} position={[0, 3, 3]} scale={[7, 4, 1]} />
+          <Lightformer
+            form="rect"
+            intensity={1.0}
+            color="#cdb8ff"
+            position={[-4, 1, 2]}
+            scale={[3, 5, 1]}
+          />
+          <Lightformer
+            form="rect"
+            intensity={0.9}
+            color="#ffd9a8"
+            position={[4, 0, 1]}
+            scale={[3, 5, 1]}
+          />
+        </Environment>
 
-        {/* Cool fill */}
-        <directionalLight position={[-3, -2, -4]} intensity={0.45} color="#bae6fd" />
+        <HappyMac />
 
-        {/* Back rim for separation against dark heroes */}
-        <directionalLight position={[0, 2, -6]} intensity={1.1} color="#dbeafe" />
-
-        {/* Soft catchlight near camera */}
-        <pointLight position={[1.5, 1.5, 3]} intensity={0.5} />
-
-        <PlanetFace />
+        <EffectComposer multisampling={0}>
+          <Bloom
+            mipmapBlur
+            intensity={0.6}
+            luminanceThreshold={0.8}
+            luminanceSmoothing={0.25}
+            radius={0.6}
+          />
+          <Vignette offset={0.3} darkness={0.7} eskil={false} />
+          <SMAA />
+        </EffectComposer>
       </Canvas>
     </div>
   );
