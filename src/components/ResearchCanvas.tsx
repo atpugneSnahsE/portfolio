@@ -1,7 +1,7 @@
 "use client";
 
 import { Canvas, useFrame } from "@react-three/fiber";
-import { useRef, useState, useMemo } from "react";
+import { useRef, useState, useMemo, useEffect } from "react";
 import * as THREE from "three";
 import { RoundedBox, Text } from "@react-three/drei";
 import { useTheme } from "next-themes";
@@ -257,76 +257,91 @@ export default function ResearchCanvas({
     []
   );
 
+  // State to hold theme after client hydration
+  const [clientTheme, setClientTheme] = useState<string | undefined>(undefined);
+
+  // Sync resolvedTheme to clientTheme after mount to avoid SSR mismatch
+  useEffect(() => {
+    setClientTheme(resolvedTheme);
+  }, [resolvedTheme]);
+
+  // Helper to determine if we have a valid client theme
+  const hasClientTheme = Boolean(clientTheme);
+
+  // Use clientTheme for calculations; fallback to light defaults for server render
+  const effectiveTheme = clientTheme ?? "light";
+
   // 1. Matches the WebGL fog directly to the target theme background colors
   const environmentColor = useMemo(() => {
-    if (resolvedTheme === "dark") return "#060913";
-    if (resolvedTheme === "forest") return "#f0fdf4"; // Exact Tailwind green 'bg-emerald-50/50' or 'bg-green-50' backdrop color
-    return "#ffffff";
-  }, [resolvedTheme]);
+    if (effectiveTheme === "dark") return "#060913";
+    if (effectiveTheme === "forest") return "#f0fdf4"; // Exact Tailwind green 'bg-emerald-50/50' or 'bg-green-50' backdrop color
+    return "#ffffff"; // light
+  }, [effectiveTheme]);
+
 
   // 2. CSS-based Dynamic Tailwind Mask Styles to override and erase any external white frame lines
   const maskClasses = useMemo(() => {
-    if (resolvedTheme === "dark") {
+    if (effectiveTheme === "dark") {
       return {
         top: "from-[#060913] to-transparent",
-        bottom: "from-transparent to-[#060913]"
+        bottom: "from-[#060913] to-transparent",
       };
     }
-    if (resolvedTheme === "forest") {
+    if (effectiveTheme === "forest") {
       return {
-        top: "from-[#f0fdf4] to-transparent", // Dynamic green gradient fade-in
-        bottom: "from-transparent to-[#f0fdf4]" // Dynamic green gradient fade-out
+        top: "from-[#f0fdf4] to-transparent", // Match forest background
+        bottom: "from-transparent to-[#f0fdf4]",
       };
     }
     return {
       top: "from-white to-transparent",
-      bottom: "from-transparent to-white"
+      bottom: "from-transparent to-white",
     };
-  }, [resolvedTheme]);
+  }, [effectiveTheme]);
 
-  const isDark = resolvedTheme === "dark";
-  const isForest = resolvedTheme === "forest";
+
+  const isDark = effectiveTheme === "dark";
+  const isForest = effectiveTheme === "forest";
 
   return (
-    <div
-      className="relative h-[740px] w-full overflow-hidden"
-      onWheel={(e) => setScrollOffset((prev) => prev + e.deltaY * 0.0012)}
-    >
-      {/* Dynamic Top Flush Gradient Shield */}
-      <div className={`absolute top-0 left-0 right-0 z-10 h-24 bg-gradient-to-b ${maskClasses.top} pointer-events-none`} />
+    <div className="relative h-[740px] w-full overflow-hidden">
+      {/* Conditional rendering: only render Canvas after client theme is known to avoid hydration mismatch */}
+      {hasClientTheme && (
+        <>
+          {/* Dynamic Top Flush Gradient Shield */}
+          <div className={`absolute top-0 left-0 right-0 z-10 h-24 bg-gradient-to-b ${maskClasses.top} pointer-events-none`} />
 
-      <Canvas
-        dpr={[1, 1.5]}
-        camera={{ position: [0, 0, 13.5], fov: 38 }}
-        gl={{ antialias: true, alpha: true }}
-      >
-        <fog attach="fog" args={[environmentColor, 11, 24]} />
+          <Canvas
+            dpr={[1, 1.5]}
+            camera={{ position: [0, 0, 13.5], fov: 38 }}
+            gl={{ antialias: true, alpha: true }}
+          >
+            {effectiveTheme === "light" && <fog attach="fog" args={[environmentColor, 11, 24]} />}
+            <ResearchParticles isDark={isDark} />
+            <ambientLight intensity={isDark ? 0.95 : isForest ? 1.3 : 1.4} />
+            <pointLight position={[0, 5, 5]} intensity={isDark ? 1.8 : 1.0} color="#ffffff" />
+            <pointLight position={[-10, 3, 2]} intensity={0.6} color={isForest ? "#10b981" : "#6366F1"} />
+            <pointLight position={[10, -3, 2]} intensity={0.6} color="#00FF87" />
+            <directionalLight position={[0, 10, 3]} intensity={isDark ? 0.5 : 0.8} />
+            {publications.slice(0, displayCount).map((pub, index) => (
+              <FloatingPublication
+                key={index}
+                publication={pub}
+                index={index}
+                total={Math.min(publications.length, displayCount)}
+                resolvedTheme={effectiveTheme}
+                activeIndex={activeIndex}
+                setActiveIndex={setActiveIndex}
+                scrollOffset={scrollOffset}
+                seed={seeds[index]}
+              />
+            ))}
+          </Canvas>
 
-        <ResearchParticles isDark={isDark} />
-
-        <ambientLight intensity={isDark ? 0.95 : isForest ? 1.3 : 1.4} />
-        <pointLight position={[0, 5, 5]} intensity={isDark ? 1.8 : 1.0} color="#ffffff" />
-        <pointLight position={[-10, 3, 2]} intensity={0.6} color={isForest ? "#10b981" : "#6366F1"} />
-        <pointLight position={[10, -3, 2]} intensity={0.6} color="#00FF87" />
-        <directionalLight position={[0, 10, 3]} intensity={isDark ? 0.5 : 0.8} />
-
-        {publications.slice(0, displayCount).map((pub, index) => (
-          <FloatingPublication
-            key={index}
-            publication={pub}
-            index={index}
-            total={Math.min(publications.length, displayCount)}
-            resolvedTheme={resolvedTheme}
-            activeIndex={activeIndex}
-            setActiveIndex={setActiveIndex}
-            scrollOffset={scrollOffset}
-            seed={seeds[index]}
-          />
-        ))}
-      </Canvas>
-
-      {/* Dynamic Bottom Flush Gradient Shield */}
-      <div className={`absolute bottom-0 left-0 right-0 z-10 h-24 bg-gradient-to-b ${maskClasses.bottom} pointer-events-none`} />
+          {/* Dynamic Bottom Flush Gradient Shield */}
+          <div className={`absolute bottom-0 left-0 right-0 z-10 h-24 bg-gradient-to-b ${maskClasses.bottom} pointer-events-none`} />
+        </>
+      )}
     </div>
   );
 }

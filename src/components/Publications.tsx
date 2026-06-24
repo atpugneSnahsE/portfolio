@@ -9,9 +9,9 @@ export default async function Publications() {
     <Section title="Publications">
       {/* 3D Research Canvas */}
       <div className="relative mb-12 overflow-hidden w-full">
-        <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-20 bg-gradient-to-b from-white to-transparent dark:from-black" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-20 bg-gradient-to-b from-white to-transparent dark:from-black forest:from-[#edf5ef]" />
         <ResearchCanvas publications={publications} />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-20 bg-gradient-to-t from-white to-transparent dark:from-black" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-20 bg-gradient-to-t from-white to-transparent dark:from-black forest:from-[#edf5ef]" />
       </div>
 
       {/* Stats */}

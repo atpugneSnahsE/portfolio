@@ -10,12 +10,17 @@ export default function Footer() {
   const [direction, setDirection] = useState(1);
   const [frame, setFrame] = useState(0);
   const [dust, setDust] = useState<Array<{ id: number; x: number; y: number }>>([]);
+  const [mounted, setMounted] = useState(false);
 
   const rafRef = useRef<number | null>(null);
   const lastTimeRef = useRef(Date.now());
   const dustIdRef = useRef(0);
   const directionRef = useRef(1);
   const positionRef = useRef(15);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Dynamic Theme Styling Profiles
   const themeStyles = {
@@ -55,7 +60,7 @@ export default function Footer() {
   };
 
   // Safe fallback resolver for custom theme setups (e.g., matching "forest")
-  const currentTheme = (resolvedTheme === "light" || resolvedTheme === "dark" || resolvedTheme === "forest") 
+  const currentTheme = (mounted && (resolvedTheme === "light" || resolvedTheme === "dark" || resolvedTheme === "forest")) 
     ? resolvedTheme 
     : "dark";
 

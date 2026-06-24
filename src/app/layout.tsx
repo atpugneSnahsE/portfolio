@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   title: "Eshan Sengupta",
   description:
     "Machine Learning Engineer, Researcher, and AI Systems Developer",
+  icons: {
+    icon: "/header.png",
+  },
 };
 
 export default function RootLayout({
