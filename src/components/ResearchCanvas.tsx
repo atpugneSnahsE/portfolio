@@ -47,34 +47,34 @@ function PublicationCard({
 
   const cardColor = useMemo(() => {
     if (resolvedTheme === "dark") return "#1e2538"; // Visible dark grayish-blue
-    if (resolvedTheme === "forest") return "#142c1c"; // Organic deep forest green
-    return "#fbfcfd"; 
+    if (resolvedTheme === "forest") return "#2f8a4e"; // Leafy green
+    return "#fbfcfd";
   }, [resolvedTheme]);
 
   const titleColor = useMemo(() => {
     if (resolvedTheme === "dark") return "#FFFFFF";
-    if (resolvedTheme === "forest") return "#f0fdf4";
+    if (resolvedTheme === "forest") return "#f0fdf4"; // Near-white, strong on leafy green
     return "#0f1115";
   }, [resolvedTheme]);
 
   const subtitleColor = useMemo(() => {
-    if (resolvedTheme === "dark") return "#94a3b8"; 
-    if (resolvedTheme === "forest") return "#81b29a";
+    if (resolvedTheme === "dark") return "#94a3b8";
+    if (resolvedTheme === "forest") return "#d4f0dd"; // Pale mint, reads on leafy card
     return "#4A5262";
   }, [resolvedTheme]);
 
   const buttonBg = useMemo(() => {
-    if (resolvedTheme === "dark") return "#2a344d"; 
-    if (resolvedTheme === "forest") return "#1f442b";
+    if (resolvedTheme === "dark") return "#2a344d";
+    if (resolvedTheme === "forest") return "#216b3a"; // Darker leaf, sits below the card
     return "#eaeef3";
   }, [resolvedTheme]);
 
   useFrame(() => {
     if (!groupRef.current) return;
-    
+
     const targetScale = isHovered ? 1.05 : 1;
     groupRef.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.12);
-    
+
     if (pillRef.current) {
       pillRef.current.emissiveIntensity = THREE.MathUtils.lerp(
         pillRef.current.emissiveIntensity,
@@ -127,8 +127,8 @@ function PublicationCard({
         </Text>
 
         <group position={[0, -0.62, 0]}>
-          <primitive 
-            object={new THREE.CapsuleGeometry(0.026, 0.36, 6, 12)} 
+          <primitive
+            object={new THREE.CapsuleGeometry(0.026, 0.36, 6, 12)}
             rotation={[0, 0, Math.PI / 2]}
             position={[0.18, 0, 0]}
           >
@@ -205,7 +205,7 @@ function FloatingPublication({
     if (!groupRef.current) return;
 
     const t = clock.getElapsedTime();
-    const baseRadius = 6.8; 
+    const baseRadius = 6.8;
     const spiralRadius = baseRadius + randA * 1.5;
     const angle = (index / total) * Math.PI * 2 * 2.5 + t * 0.022 + scrollOffset;
 
@@ -316,7 +316,9 @@ export default function ResearchCanvas({
             camera={{ position: [0, 0, 13.5], fov: 38 }}
             gl={{ antialias: true, alpha: true }}
           >
-            {effectiveTheme === "light" && <fog attach="fog" args={[environmentColor, 11, 24]} />}
+            {/* Fog now matches the backdrop in every theme so distant cards fade into the
+                background: black in dark, leafy-light in forest, white in light. */}
+            <fog attach="fog" args={[environmentColor, 11, 24]} />
             <ResearchParticles isDark={isDark} />
             <ambientLight intensity={isDark ? 0.95 : isForest ? 1.3 : 1.4} />
             <pointLight position={[0, 5, 5]} intensity={isDark ? 1.8 : 1.0} color="#ffffff" />
