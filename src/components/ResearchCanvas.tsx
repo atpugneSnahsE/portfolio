@@ -271,45 +271,58 @@ export default function ResearchCanvas({
   // Use clientTheme for calculations; fallback to light defaults for server render
   const effectiveTheme = clientTheme ?? "light";
 
-  // 1. Matches the WebGL fog directly to the target theme background colors
+  // 1. WebGL fog + backdrop color, matched EXACTLY to the page background per theme.
+  //    forest -> #f2f7f4, dark -> pure black, light -> pure white.
   const environmentColor = useMemo(() => {
-    if (effectiveTheme === "dark") return "#060913";
-    if (effectiveTheme === "forest") return "#f0fdf4"; // Exact Tailwind green 'bg-emerald-50/50' or 'bg-green-50' backdrop color
+    if (effectiveTheme === "dark") return "#000000";
+    if (effectiveTheme === "forest") return "#f2f7f4";
     return "#ffffff"; // light
   }, [effectiveTheme]);
 
-
-  // 2. CSS-based Dynamic Tailwind Mask Styles to override and erase any external white frame lines
-  const maskClasses = useMemo(() => {
-    if (effectiveTheme === "dark") {
-      return {
-        top: "from-[#060913] to-transparent",
-        bottom: "from-[#060913] to-transparent",
-      };
-    }
-    if (effectiveTheme === "forest") {
-      return {
-        top: "from-[#f0fdf4] to-transparent", // Match forest background
-        bottom: "from-transparent to-[#f0fdf4]",
-      };
-    }
+  // 2. Inline edge-fade gradients. Each fades from the exact backdrop tone to the SAME
+  //    RGB at zero alpha (`${c}00`) rather than CSS `transparent`. `transparent` is
+  //    rgba(0,0,0,0) — transparent *black* — so fading to it pushes the midtones toward
+  //    gray and leaves a visible band on light themes. Appending the alpha byte keeps
+  //    the gradient true to the backdrop all the way down, so the edges truly dissolve.
+  const edgeFades = useMemo(() => {
+    const c = environmentColor; // clean 6-digit hex
+    const fade = `${c}00`; // same RGB, alpha 0
     return {
-      top: "from-white to-transparent",
-      bottom: "from-transparent to-white",
+      top: `linear-gradient(to bottom, ${c} 0%, ${fade} 100%)`,
+      bottom: `linear-gradient(to top, ${c} 0%, ${fade} 100%)`,
+      left: `linear-gradient(to right, ${c} 0%, ${fade} 100%)`,
+      right: `linear-gradient(to left, ${c} 0%, ${fade} 100%)`,
     };
-  }, [effectiveTheme]);
-
+  }, [environmentColor]);
 
   const isDark = effectiveTheme === "dark";
   const isForest = effectiveTheme === "forest";
 
   return (
-    <div className="relative h-[740px] w-full overflow-hidden">
+    <div
+      className="relative h-[740px] w-full overflow-hidden"
+      // Solid backdrop in the exact theme color. The canvas is alpha-transparent and
+      // sits on top, so all empty space, the fog, and the edge fades resolve to this
+      // same color — the region reads as one seamless field with no visible box edge.
+      style={{ backgroundColor: environmentColor }}
+    >
       {/* Conditional rendering: only render Canvas after client theme is known to avoid hydration mismatch */}
       {hasClientTheme && (
         <>
-          {/* Dynamic Top Flush Gradient Shield */}
-          <div className={`absolute top-0 left-0 right-0 z-10 h-24 bg-gradient-to-b ${maskClasses.top} pointer-events-none`} />
+          {/* Edge fades on all four sides, in every theme, so cards dissolve into the
+              backdrop instead of being hard-cut at the canvas boundary. */}
+          <div
+            className="absolute top-0 left-0 right-0 z-10 h-28 pointer-events-none"
+            style={{ background: edgeFades.top }}
+          />
+          <div
+            className="absolute left-0 top-0 bottom-0 z-10 w-28 pointer-events-none"
+            style={{ background: edgeFades.left }}
+          />
+          <div
+            className="absolute right-0 top-0 bottom-0 z-10 w-28 pointer-events-none"
+            style={{ background: edgeFades.right }}
+          />
 
           <Canvas
             dpr={[1, 1.5]}
@@ -340,8 +353,11 @@ export default function ResearchCanvas({
             ))}
           </Canvas>
 
-          {/* Dynamic Bottom Flush Gradient Shield */}
-          <div className={`absolute bottom-0 left-0 right-0 z-10 h-24 bg-gradient-to-b ${maskClasses.bottom} pointer-events-none`} />
+          {/* Bottom fade (correct upward direction in all themes, including dark) */}
+          <div
+            className="absolute bottom-0 left-0 right-0 z-10 h-28 pointer-events-none"
+            style={{ background: edgeFades.bottom }}
+          />
         </>
       )}
     </div>

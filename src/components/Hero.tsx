@@ -25,7 +25,7 @@ const VesselCanvas = dynamic(
       >
         <div className="text-center">
           <p className="text-lg text-zinc-500">
-            Loading AI Visualization...
+            Loading ...
           </p>
         </div>
       </div>
