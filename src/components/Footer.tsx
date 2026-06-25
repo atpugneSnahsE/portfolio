@@ -1,412 +1,240 @@
 "use client";
 
-import {
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import { useEffect, useSyncExternalStore, useState } from "react";
 import { useTheme } from "next-themes";
 
-/* ------------------------------------------------------------------ *
- *  Tunables
- * ------------------------------------------------------------------ */
-const SPEED = 18; // % of track width travelled per second
-const LEFT_BOUND = 8; // % minimum position
-const RIGHT_BOUND = 88; // % maximum position
-const LEG_INTERVAL = 0.12; // seconds between leg swaps
-const HUMAN_TRAIL = 10; // % the human trails behind the dino
-const DUST_POOL = 14; // recycled particle nodes
+const COMMANDS = [
+  { cmd: "whoami", output: "Eshan. AI engineer. Professional bug collector." },
+  { cmd: "cat about/skills", output: "Machine Learning · Computer Vision · React · SQL · Coffee" },
+  { cmd: "git status", output: "On branch main. Still debugging life." },
+  { cmd: "echo $CURRENT_MOOD", output: "training... epoch 937/∞" },
+  { cmd: "sudo make me famous", output: "Permission denied." },
+  { cmd: "python train.py", output: "GPU: crying. Fan: screaming." },
+  { cmd: "ls publications/", output: "Springer said yes. Reviewer #2 said no." },
+  { cmd: "grep -r 'motivation' .", output: "Found in coffee.txt" },
+  { cmd: "nvidia-smi", output: "VRAM full. Dreams larger." },
+  { cmd: "cv --detect-plate", output: "License plate found. Driver still missing." },
+  { cmd: "cat /dev/brain", output: "Loading... please wait." },
+  { cmd: "ping reality", output: "Request timed out." },
+  { cmd: "history | tail -5", output: "git commit, train model, fix bug, break model, repeat." },
+  { cmd: "echo $LOCATION", output: "Probably somewhere between Vilnius and Stack Overflow." },
+  { cmd: "uptime", output: "Building weird things since 2019." },
+  { cmd: "rm -rf bugs", output: "Nice try." },
+  { cmd: "find . -name 'free_time'", output: "No such file or directory." },
+  { cmd: "docker ps", output: "Running: 12 containers. Sleeping: 0 hours." },
+  { cmd: "paper publish", output: "Waiting for Reviewer #2..." },
+  { cmd: "fortune", output: "Your next model will converge. Probably." }
+];
 
-/* ------------------------------------------------------------------ *
- *  Theme profiles (defined once, outside the component)
- * ------------------------------------------------------------------ */
-const THEME_STYLES = {
+const CURSOR_BLINK_MS = 530;
+const TYPING_SPEED_MS = 65;
+const POST_TYPING_DELAY_MS = 500;
+const OUTPUT_DURATION_MS = 3500;
+const CLEAR_DURATION_MS = 300;
+
+type Phase = "typing" | "waiting" | "output" | "clear";
+type ThemeName = "dark" | "light" | "forest";
+
+const THEME: Record<
+  ThemeName,
+  {
+    bg: string;
+    border: string;
+    text: string;
+    prompt: string;
+    output: string;
+    cursor: string;
+    glow: string;
+    scanLine: string;
+  }
+> = {
   dark: {
-    footerBg: "bg-black",
-    borderColor: "border-zinc-900",
-    textColor: "text-zinc-500",
-    groundLine1: "via-zinc-600",
-    groundLine2: "bg-zinc-800",
-    textureColor: "#52525b",
-    dinoColor: "text-zinc-500",
-    humanColor: "text-sky-400",
-    dustColor: "bg-zinc-600/70",
-    eyeFill: "fill-zinc-100",
-    signature: "text-emerald-400",
+    bg: "bg-zinc-950",
+    border: "border-zinc-800",
+    text: "text-zinc-500",
+    prompt: "text-emerald-400",
+    output: "text-zinc-200",
+    cursor: "bg-emerald-400",
+    glow: "0 0 16px rgba(52,211,153,0.08)",
+    scanLine: "rgba(255,255,255,0.03)",
   },
   light: {
-    footerBg: "bg-[#f4f4f5]",
-    borderColor: "border-zinc-200",
-    textColor: "text-zinc-400",
-    groundLine1: "via-zinc-400",
-    groundLine2: "bg-zinc-300",
-    textureColor: "#a1a1aa",
-    dinoColor: "text-zinc-600",
-    humanColor: "text-blue-500",
-    dustColor: "bg-zinc-400/70",
-    eyeFill: "fill-zinc-900",
-    signature: "text-emerald-400",
+    bg: "bg-zinc-900",
+    border: "border-zinc-700",
+    text: "text-zinc-400",
+    prompt: "text-emerald-400",
+    output: "text-zinc-100",
+    cursor: "bg-emerald-400",
+    glow: "0 2px 12px rgba(0,0,0,0.1)",
+    scanLine: "rgba(255,255,255,0.04)",
   },
   forest: {
-    footerBg: "bg-[#0c1e12]",
-    borderColor: "border-[#14321d]",
-    textColor: "text-[#4a6b53]",
-    groundLine1: "via-[#2d5a39]",
-    groundLine2: "bg-[#1b3d24]",
-    textureColor: "#22c55e",
-    dinoColor: "text-[#3fae4f]",
-    humanColor: "text-[#a7f3d0]",
-    dustColor: "bg-[#2d5a39]/70",
-    eyeFill: "fill-zinc-100",
-    signature: "text-emerald-300",
+    bg: "bg-[#0a1a0f]",
+    border: "border-[#1a3a22]",
+    text: "text-[#4a8b5a]",
+    prompt: "text-emerald-300",
+    output: "text-[#d4edda]",
+    cursor: "bg-emerald-300",
+    glow: "0 0 16px rgba(16,185,129,0.1)",
+    scanLine: "rgba(255,255,255,0.03)",
   },
-} as const;
-
-type ThemeName = keyof typeof THEME_STYLES;
-
-const clamp = (n: number, min: number, max: number) =>
-  Math.min(Math.max(n, min), max);
-
-// useLayoutEffect warns during SSR; fall back to useEffect on the server.
-const useIsoLayoutEffect =
-  typeof window !== "undefined" ? useLayoutEffect : useEffect;
+};
 
 export default function Footer() {
   const { resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
 
-  /* --- DOM refs: everything animation-related is driven through these,
-         so the component never re-renders while the scene is moving --- */
-  const sceneRef = useRef<HTMLDivElement>(null);
-  const widthRef = useRef(0);
+  const theme: ThemeName =
+    mounted && ["dark", "light", "forest"].includes(resolvedTheme ?? "")
+      ? (resolvedTheme as ThemeName)
+      : "dark";
+  const s = THEME[theme];
 
-  const dinoRef = useRef<HTMLDivElement>(null);
-  const dinoFlipRef = useRef<HTMLDivElement>(null);
-  const dinoLegA = useRef<SVGGElement>(null);
-  const dinoLegB = useRef<SVGGElement>(null);
-
-  const humanRef = useRef<HTMLDivElement>(null);
-  const humanFlipRef = useRef<HTMLDivElement>(null);
-  const humanLegA = useRef<SVGGElement>(null);
-  const humanLegB = useRef<SVGGElement>(null);
-
-  const dustNodes = useRef<Array<HTMLDivElement | null>>([]);
-  const dustCursor = useRef(0);
-
-  // Mutable simulation state — lives outside React's render cycle.
-  const sim = useRef({
-    pos: LEFT_BOUND + 7,
-    dir: 1,
-    frame: 0,
-    legAcc: 0,
-    dustAcc: 0,
-    dustGap: 0.13,
+  const [cmdIdx, setCmdIdx] = useState(0);
+  const [typed, setTyped] = useState(0);
+  const [showOutput, setShowOutput] = useState(false);
+  const [cursor, setCursor] = useState(true);
+  const [phase, setPhase] = useState<Phase>("typing");
+  const [isReduced, setIsReduced] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   });
 
-  useEffect(() => setMounted(true), []);
+  const current = COMMANDS[cmdIdx];
 
-  const currentTheme: ThemeName =
-    mounted &&
-    (resolvedTheme === "light" ||
-      resolvedTheme === "dark" ||
-      resolvedTheme === "forest")
-      ? resolvedTheme
-      : "dark";
-  const style = THEME_STYLES[currentTheme];
-
-  /* ---------------------------------------------------------------- *
-   *  Imperative helpers (read refs only — never stale)
-   * ---------------------------------------------------------------- */
-  const place = (
-    outer: HTMLDivElement | null,
-    flip: HTMLDivElement | null,
-    posPct: number,
-    dir: number,
-  ) => {
-    if (!outer || !flip) return;
-    const x = (posPct / 100) * widthRef.current;
-    // translate3d keeps movement on the compositor (no layout per frame)
-    outer.style.transform = `translate3d(${x}px,0,0)`;
-    flip.style.transform = `translateX(-50%) scaleX(${dir})`;
-  };
-
-  const showLeg = (
-    a: SVGGElement | null,
-    b: SVGGElement | null,
-    frame: number,
-  ) => {
-    if (a) a.style.display = frame === 0 ? "" : "none";
-    if (b) b.style.display = frame === 0 ? "none" : "";
-  };
-
-  const placeAll = (pos: number, dir: number) => {
-    place(dinoRef.current, dinoFlipRef.current, pos, dir);
-    const humanPos = clamp(
-      pos + (dir === 1 ? -HUMAN_TRAIL : HUMAN_TRAIL),
-      0,
-      100,
-    );
-    place(humanRef.current, humanFlipRef.current, humanPos, dir);
-  };
-
-  const emitDust = (xPct: number, yPct: number) => {
-    const pool = dustNodes.current;
-    if (!pool.length) return;
-    const el = pool[dustCursor.current % pool.length];
-    dustCursor.current += 1;
-    if (!el) return;
-    el.style.left = `${xPct}%`;
-    el.style.top = `${yPct}%`;
-    // Web Animations API: one-off, runs off the main thread, self-cleans.
-    el.animate(
-      [
-        { opacity: 0.7, transform: "translateY(0) scale(1)" },
-        { opacity: 0, transform: "translateY(-10px) scale(0.5)" },
-      ],
-      { duration: 700, easing: "ease-out", fill: "forwards" },
-    );
-  };
-
-  /* ---------------------------------------------------------------- *
-   *  Measure + initial paint (before first frame, so there's no flash)
-   * ---------------------------------------------------------------- */
-  useIsoLayoutEffect(() => {
-    const el = sceneRef.current;
-    if (!el) return;
-
-    const sync = () => {
-      widthRef.current = el.offsetWidth;
-      const s = sim.current;
-      placeAll(s.pos, s.dir);
-    };
-    sync();
-
-    const ro = new ResizeObserver(sync);
-    ro.observe(el);
-    return () => ro.disconnect();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const handler = (e: MediaQueryListEvent) => setIsReduced(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
   }, []);
 
-  /* ---------------------------------------------------------------- *
-   *  Main loop — single rAF, delta-timed, reduced-motion aware
-   * ---------------------------------------------------------------- */
   useEffect(() => {
-    const prefersReduced = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
+    if (isReduced) return;
+    const id = setInterval(() => setCursor((c) => !c), CURSOR_BLINK_MS);
+    return () => clearInterval(id);
+  }, [isReduced]);
 
-    if (prefersReduced) {
-      // Hold a calm, static pose instead of animating.
-      showLeg(dinoLegA.current, dinoLegB.current, 0);
-      showLeg(humanLegA.current, humanLegB.current, 0);
-      return;
+  useEffect(() => {
+    if (isReduced) return;
+
+    let timer: ReturnType<typeof setTimeout>;
+
+    switch (phase) {
+      case "typing":
+        if (typed < current.cmd.length) {
+          timer = setTimeout(() => setTyped((t) => t + 1), TYPING_SPEED_MS);
+        } else {
+          timer = setTimeout(
+            () => setPhase("waiting"),
+            POST_TYPING_DELAY_MS,
+          );
+        }
+        break;
+      case "waiting":
+        timer = setTimeout(() => {
+          setShowOutput(true);
+          setPhase("output");
+        }, 500);
+        break;
+      case "output":
+        timer = setTimeout(() => setPhase("clear"), OUTPUT_DURATION_MS);
+        break;
+      case "clear":
+        timer = setTimeout(() => {
+          setCmdIdx((i) => (i + 1) % COMMANDS.length);
+          setTyped(0);
+          setShowOutput(false);
+          setPhase("typing");
+        }, CLEAR_DURATION_MS);
+        break;
     }
 
-    let raf = 0;
-    let last = performance.now();
+    return () => clearTimeout(timer);
+  }, [phase, typed, current.cmd.length, isReduced]);
 
-    const tick = (t: number) => {
-      const s = sim.current;
-      const dt = Math.min((t - last) / 1000, 0.05); // clamp tab-switch gaps
-      last = t;
-
-      // Move + bounce off the bounds
-      s.pos += s.dir * SPEED * dt;
-      if (s.pos >= RIGHT_BOUND) {
-        s.pos = RIGHT_BOUND;
-        s.dir = -1;
-      } else if (s.pos <= LEFT_BOUND) {
-        s.pos = LEFT_BOUND;
-        s.dir = 1;
-      }
-      placeAll(s.pos, s.dir);
-
-      // Leg swap
-      s.legAcc += dt;
-      if (s.legAcc >= LEG_INTERVAL) {
-        s.legAcc = 0;
-        s.frame ^= 1;
-        showLeg(dinoLegA.current, dinoLegB.current, s.frame);
-        showLeg(humanLegA.current, humanLegB.current, s.frame);
-      }
-
-      // Dust kicks from the dino's trailing foot
-      s.dustAcc += dt;
-      if (s.dustAcc >= s.dustGap) {
-        s.dustAcc = 0;
-        s.dustGap = 0.1 + Math.random() * 0.07;
-        emitDust(s.pos - 2, 68 + Math.random() * 5);
-      }
-
-      raf = requestAnimationFrame(tick);
-    };
-
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const displayCmd = isReduced
+    ? current.cmd
+    : current.cmd.slice(0, typed);
 
   return (
     <>
+      {/* eslint-disable-next-line @next/next/no-page-custom-font */}
       <link
-        href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap"
         rel="stylesheet"
       />
-
       <footer
-        className={`relative w-full overflow-hidden border-t ${style.borderColor} ${style.footerBg} py-6 transition-colors duration-300`}
+        className={`relative w-full overflow-hidden border-t py-5 transition-colors duration-300 ${s.border} ${mounted ? s.bg : "bg-zinc-950"}`}
       >
-        <div className="relative mx-auto max-w-6xl px-6">
-          {/* Scene canvas */}
+        <div
+          className="pointer-events-none absolute inset-0 z-10"
+          style={{
+            backgroundImage: `repeating-linear-gradient(0deg, transparent, transparent 1px, ${s.scanLine} 1px, ${s.scanLine} 2px)`,
+          }}
+        />
+
+        <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
           <div
-            ref={sceneRef}
-            className="relative mb-3 h-24 w-full overflow-hidden"
-            aria-hidden="true"
+            className={`rounded-lg border overflow-hidden ${s.border}`}
+            style={{ boxShadow: s.glow }}
           >
-            {/* Ground */}
             <div
-              className={`absolute bottom-5 left-0 right-0 h-px bg-gradient-to-r from-transparent ${style.groundLine1} to-transparent`}
-            />
-            <div
-              className={`absolute bottom-4 left-0 right-0 h-px ${style.groundLine2}`}
-            />
-
-            {/* Trail texture */}
-            <div
-              className="absolute bottom-4 left-0 right-0 h-2 opacity-20 motion-reduce:animate-none"
-              style={{
-                backgroundImage: `repeating-linear-gradient(90deg, ${style.textureColor} 0px, ${style.textureColor} 3px, transparent 3px, transparent 18px)`,
-                animation: "scrollGround 2.2s linear infinite",
-              }}
-            />
-
-            {/* Dino */}
-            <div
-              ref={dinoRef}
-              className="absolute bottom-3 left-0 will-change-transform"
+              className={`flex items-center border-b ${s.border} px-3 py-1 ${s.bg}`}
             >
-              <div ref={dinoFlipRef} style={{ transform: "translateX(-50%)" }}>
-                <svg
-                  width="68"
-                  height="68"
-                  viewBox="0 0 28 26"
-                  fill="currentColor"
-                  className={`${style.dinoColor} transition-colors duration-300`}
-                  style={{ imageRendering: "pixelated" }}
-                >
-                  {/* Body */}
-                  <rect x="13" y="1" width="9" height="6" />
-                  <rect x="15" y="0" width="4" height="2" />
-                  <rect
-                    x="17"
-                    y="3"
-                    width="1.5"
-                    height="1.5"
-                    className={style.eyeFill}
+              <div className="flex gap-1.5">
+                {["#ff5f56", "#ffbd2e", "#27c93f"].map((c, i) => (
+                  <div
+                    key={i}
+                    className="h-2.5 w-2.5 rounded-full"
+                    style={{ backgroundColor: c }}
                   />
-                  <rect x="20" y="6" width="5" height="2" />
-                  <rect x="18" y="8" width="6" height="2" />
-                  <rect x="12" y="7" width="4" height="5" />
-                  <rect x="7" y="10" width="12" height="7" />
-                  <rect x="3" y="12" width="6" height="3" />
-                  <rect x="2" y="14" width="4" height="2" />
-                  <rect x="15" y="12" width="3" height="1.5" />
-                  <rect x="16" y="13.5" width="1.5" height="1.5" />
-
-                  {/* Legs — frame A */}
-                  <g ref={dinoLegA}>
-                    <rect x="9" y="17" width="2.5" height="6" />
-                    <rect x="8" y="22" width="4" height="1.5" />
-                    <rect x="14" y="17" width="2.5" height="4" />
-                  </g>
-                  {/* Legs — frame B */}
-                  <g ref={dinoLegB} style={{ display: "none" }}>
-                    <rect x="9" y="17" width="2.5" height="4" />
-                    <rect x="14" y="17" width="2.5" height="6" />
-                    <rect x="13" y="22" width="4" height="1.5" />
-                  </g>
-                </svg>
+                ))}
               </div>
+              <span
+                className={`ml-3 text-[10px] font-medium tracking-wide ${s.text}`}
+              >
+                eshan@portfolio:~
+              </span>
             </div>
 
-            {/* Human */}
-            <div
-              ref={humanRef}
-              className="absolute bottom-3 left-0 will-change-transform"
-            >
-              <div ref={humanFlipRef} style={{ transform: "translateX(-50%)" }}>
-                <svg
-                  width="32"
-                  height="44"
-                  viewBox="0 0 14 22"
-                  fill="currentColor"
-                  className={`${style.humanColor} transition-colors duration-300`}
+            <div className="min-h-[3.25rem] px-4 py-2 font-mono text-sm leading-relaxed flex flex-col justify-center">
+              <div className="flex items-baseline gap-2">
+                <span
+                  className={`shrink-0 select-none font-medium ${s.prompt}`}
                 >
-                  <rect x="3" y="0" width="8" height="7" rx="3" />
-                  <rect x="4" y="7" width="6" height="7" />
-
-                  {/* Limbs — frame A */}
-                  <g ref={humanLegA}>
-                    <rect x="1" y="8" width="3" height="2" />
-                    <rect x="10" y="11" width="3" height="2" />
-                    <rect x="4" y="14" width="2" height="6" />
-                    <rect x="8" y="14" width="2" height="5" />
-                  </g>
-                  {/* Limbs — frame B */}
-                  <g ref={humanLegB} style={{ display: "none" }}>
-                    <rect x="10" y="8" width="3" height="2" />
-                    <rect x="1" y="11" width="3" height="2" />
-                    <rect x="4" y="14" width="2" height="5" />
-                    <rect x="8" y="14" width="2" height="6" />
-                  </g>
-                </svg>
+                  $
+                </span>
+                <span className={s.output}>{displayCmd}</span>
+                {(phase === "typing" || phase === "waiting") && cursor && (
+                  <span
+                    className={`inline-block w-[0.55em] h-[1.1em] translate-y-0.5 ${s.cursor}`}
+                  />
+                )}
               </div>
+              {showOutput && (
+                <div className={`mt-1 flex gap-2 ${s.text}`}>
+                  <span className="select-none opacity-40">&rarr;</span>
+                  <span>{current.output}</span>
+                </div>
+              )}
             </div>
-
-            {/* Dust — fixed recycled pool, animated via WAAPI */}
-            {Array.from({ length: DUST_POOL }).map((_, i) => (
-              <div
-                key={i}
-                ref={(el) => {
-                  dustNodes.current[i] = el;
-                }}
-                className={`pointer-events-none absolute h-1 w-1 rounded-full ${style.dustColor}`}
-                style={{ left: 0, top: "70%", opacity: 0 }}
-              />
-            ))}
           </div>
 
-          {/* Credit */}
-          <div className="flex justify-end">
-            <p
-              className={`text-[8px] tracking-wider ${style.textColor}`}
-              style={{ fontFamily: "'Press Start 2P', monospace" }}
-            >
+          <div className="mt-2 flex justify-end">
+            <p className={`font-mono text-[10px] tracking-wider ${s.text}`}>
               built with{" "}
-              <span className="text-rose-500 motion-safe:animate-pulse">
+              <span className="motion-safe:animate-pulse text-rose-400">
                 &lt;3
               </span>{" "}
-              by <span className={style.signature}>eshan with 🦖</span>
+              by eshan
             </p>
           </div>
         </div>
-
-        <style jsx>{`
-          @keyframes scrollGround {
-            from {
-              transform: translateX(0);
-            }
-            to {
-              transform: translateX(-50%);
-            }
-          }
-          @media (prefers-reduced-motion: reduce) {
-            * {
-              animation: none !important;
-            }
-          }
-        `}</style>
       </footer>
     </>
   );

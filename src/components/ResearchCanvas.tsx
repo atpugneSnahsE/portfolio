@@ -1,363 +1,474 @@
 "use client";
 
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { useRef, useState, useMemo, useEffect } from "react";
+import { Line, OrbitControls, Text, Billboard } from "@react-three/drei";
 import * as THREE from "three";
-import { RoundedBox, Text } from "@react-three/drei";
 import { useTheme } from "next-themes";
 import ResearchParticles from "./ResearchParticles";
 
+/* ------------------------------------------------------------------ *
+ *  Types
+ * ------------------------------------------------------------------ */
 type Publication = {
   title: string;
   year: string;
   venue: string;
   url?: string;
+  type?: string;
 };
 
-const ACCENT_COLORS = [
-  "#00FF87", // Vivid Neon Green
-  "#00A8FF", // Bright Electric Blue
-  "#00FFD2", // Cyan/Teal Mint
-  "#3B82F6", // Classic Royal Blue
+type ThemeName = "dark" | "light" | "forest";
+
+/* ------------------------------------------------------------------ *
+ *  Planet colour palette
+ * ------------------------------------------------------------------ */
+const DARK_COLORS = [
+  "#FF6B6B", "#4ECDC4", "#FFE66D", "#A8E6CF",
+  "#FF8A5C", "#7C4DFF", "#FF4081", "#00BCD4",
+  "#CDDC39", "#E91E63", "#3F51B5", "#FF9800",
 ];
 
-function PublicationCard({
-  publication,
-  resolvedTheme,
-  activeIndex,
-  setActiveIndex,
-  index,
-  accentColor,
-}: {
-  publication: Publication;
-  resolvedTheme: string | undefined;
-  activeIndex: number | null;
-  setActiveIndex: (index: number | null) => void;
-  index: number;
-  accentColor: string;
-}) {
-  const groupRef = useRef<THREE.Group>(null);
-  const bodyRef = useRef<THREE.MeshStandardMaterial>(null);
-  const pillRef = useRef<THREE.MeshStandardMaterial>(null);
-  const isHovered = activeIndex === index;
+const LIGHT_COLORS = [
+  "#C62828", "#00695C", "#F9A825", "#2E7D32",
+  "#E65100", "#4527A0", "#AD1457", "#00838F",
+  "#9E9D24", "#880E4F", "#283593", "#EF6C00",
+];
 
-  const CARD_W = 4.6;
-  const CARD_H = 2.4;
-  const CARD_D = 0.06;
+/* ------------------------------------------------------------------ *
+ *  Deterministic pseudo-random
+ * ------------------------------------------------------------------ */
+function seedRand(seed: number): number {
+  const x = Math.sin(seed * 127.1 + 311.7) * 43758.5453;
+  return x - Math.floor(x);
+}
 
-  const cardColor = useMemo(() => {
-    if (resolvedTheme === "dark") return "#1e2538"; // Visible dark grayish-blue
-    if (resolvedTheme === "forest") return "#2f8a4e"; // Leafy green
-    return "#fbfcfd";
-  }, [resolvedTheme]);
+/* ------------------------------------------------------------------ *
+ *  Glow sprite texture (singleton)
+ * ------------------------------------------------------------------ */
+let _glowTex: THREE.CanvasTexture | null = null;
+function glowTex() {
+  if (_glowTex) return _glowTex;
+  const c = document.createElement("canvas");
+  c.width = c.height = 64;
+  const ctx = c.getContext("2d")!;
+  const g = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+  g.addColorStop(0, "rgba(255,255,255,1)");
+  g.addColorStop(0.2, "rgba(255,255,255,0.6)");
+  g.addColorStop(0.5, "rgba(255,255,255,0.1)");
+  g.addColorStop(1, "rgba(255,255,255,0)");
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, 64, 64);
+  _glowTex = new THREE.CanvasTexture(c);
+  return _glowTex;
+}
 
-  const titleColor = useMemo(() => {
-    if (resolvedTheme === "dark") return "#FFFFFF";
-    if (resolvedTheme === "forest") return "#f0fdf4"; // Near-white, strong on leafy green
-    return "#0f1115";
-  }, [resolvedTheme]);
+/* ------------------------------------------------------------------ *
+ *  Theme environment
+ * ------------------------------------------------------------------ */
+const ENV = {
+  dark:   { bg: "#000000", fogNear: 3, fogFar: 9,  particles: "#38bdf8", particleOpacity: 0.35, hintColor: "text-zinc-300", sunGlow: "#ffcc80" },
+  light:  { bg: "#ffffff", fogNear: 3, fogFar: 8.5, particles: "#6366f1", particleOpacity: 0.25, hintColor: "text-zinc-500", sunGlow: "#ffcc02" },
+  forest: { bg: "#f2f7f4", fogNear: 2.5, fogFar: 7.5, particles: "#22c55e", particleOpacity: 0.3,  hintColor: "text-emerald-800", sunGlow: "#fbbf24" },
+} as const;
 
-  const subtitleColor = useMemo(() => {
-    if (resolvedTheme === "dark") return "#94a3b8";
-    if (resolvedTheme === "forest") return "#d4f0dd"; // Pale mint, reads on leafy card
-    return "#4A5262";
-  }, [resolvedTheme]);
+/* ------------------------------------------------------------------ *
+ *  CentralStar — glowing sun at the centre
+ * ------------------------------------------------------------------ */
+function CentralStar({ theme }: { theme: ThemeName }) {
+  const ref = useRef<THREE.Group>(null);
+  const glowC = ENV[theme].sunGlow;
 
-  const buttonBg = useMemo(() => {
-    if (resolvedTheme === "dark") return "#2a344d";
-    if (resolvedTheme === "forest") return "#216b3a"; // Darker leaf, sits below the card
-    return "#eaeef3";
-  }, [resolvedTheme]);
-
-  useFrame(() => {
-    if (!groupRef.current) return;
-
-    const targetScale = isHovered ? 1.05 : 1;
-    groupRef.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.12);
-
-    if (pillRef.current) {
-      pillRef.current.emissiveIntensity = THREE.MathUtils.lerp(
-        pillRef.current.emissiveIntensity,
-        isHovered ? 2.5 : 1.2,
-        0.12
-      );
-    }
+  useFrame(({ clock }) => {
+    if (!ref.current) return;
+    const pulse = 1 + 0.05 * Math.sin(clock.elapsedTime * 1.2);
+    ref.current.scale.setScalar(pulse);
   });
 
   return (
-    <group
-      ref={groupRef}
-      onPointerEnter={(e) => {
-        e.stopPropagation();
-        document.body.style.cursor = "pointer";
-        setActiveIndex(index);
-      }}
-      onPointerLeave={(e) => {
-        e.stopPropagation();
-        document.body.style.cursor = "default";
-        setActiveIndex(null);
-      }}
-      onClick={() => {
-        if (publication.url) window.open(publication.url, "_blank");
-      }}
-    >
-      <RoundedBox args={[CARD_W, CARD_H, CARD_D]} radius={0.06}>
-        <meshStandardMaterial
-          ref={bodyRef}
-          color={cardColor}
-          roughness={0.4}
-          metalness={0.02}
-        />
-      </RoundedBox>
-
-      <group position={[-CARD_W / 2 + 0.3, CARD_H / 2 - 0.35, CARD_D / 2 + 0.005]}>
-        <Text
-          position={[0, 0, 0]}
-          fontSize={0.21}
-          maxWidth={4.0}
-          lineHeight={1.2}
-          color={titleColor}
-          anchorX="left"
-          anchorY="top"
-          fontWeight="bold"
-        >
-          {publication.title.length > 60
-            ? publication.title.slice(0, 60) + "…"
-            : publication.title}
-        </Text>
-
-        <group position={[0, -0.62, 0]}>
-          <primitive
-            object={new THREE.CapsuleGeometry(0.026, 0.36, 6, 12)}
-            rotation={[0, 0, Math.PI / 2]}
-            position={[0.18, 0, 0]}
-          >
-            <meshStandardMaterial
-              ref={pillRef}
-              color={accentColor}
-              emissive={accentColor}
-              emissiveIntensity={1.2}
-            />
-          </primitive>
-        </group>
-
-        <Text
-          position={[0, -0.82, 0]}
-          fontSize={0.13}
-          maxWidth={3.9}
-          color={subtitleColor}
-          anchorX="left"
-          anchorY="top"
-        >
-          {`${publication.venue || "IEEE Trans"}, ${publication.year}`}
-        </Text>
-
-        <group position={[0.42, -1.45, 0.005]}>
-          <RoundedBox args={[0.95, 0.32, 0.02]} radius={0.04}>
-            <meshStandardMaterial color={buttonBg} roughness={0.5} />
-          </RoundedBox>
-          <Text
-            position={[0, 0, 0.015]}
-            fontSize={0.075}
-            color={resolvedTheme === "light" ? "#374151" : "#e2f0d9"}
-            fontWeight="bold"
-            anchorX="center"
-            anchorY="middle"
-          >
-            READ MORE
-          </Text>
-        </group>
-      </group>
+    <group ref={ref}>
+      <mesh>
+        <sphereGeometry args={[0.12, 16, 16]} />
+        <meshBasicMaterial color={glowC} />
+      </mesh>
+      <Billboard>
+        <sprite scale={1.5}>
+          <spriteMaterial map={glowTex()} color={glowC} transparent opacity={0.5} blending={THREE.AdditiveBlending} depthWrite={false} />
+        </sprite>
+      </Billboard>
+      <Billboard>
+        <sprite scale={3}>
+          <spriteMaterial map={glowTex()} color={glowC} transparent opacity={0.15} blending={THREE.AdditiveBlending} depthWrite={false} />
+        </sprite>
+      </Billboard>
     </group>
   );
 }
 
-function FloatingPublication({
-  publication,
-  index,
-  total,
-  resolvedTheme,
-  activeIndex,
-  setActiveIndex,
-  scrollOffset,
-  seed,
+/* ------------------------------------------------------------------ *
+ *  OrbitRing — visible path for a planet
+ * ------------------------------------------------------------------ */
+function OrbitRing({ radius, color, opacity }: { radius: number; color: string; opacity: number }) {
+  const points = useMemo(() => {
+    const pts: [number, number, number][] = [];
+    for (let i = 0; i <= 64; i++) {
+      const theta = (i / 64) * Math.PI * 2;
+      pts.push([Math.cos(theta) * radius, 0, Math.sin(theta) * radius]);
+    }
+    return pts;
+  }, [radius]);
+
+  return <Line points={points} color={color} transparent opacity={opacity} depthWrite={false} />;
+}
+
+/* ------------------------------------------------------------------ *
+ *  Planet — orbiting publication node
+ * ------------------------------------------------------------------ */
+function Planet({
+  pub, color, orbitRadius, speed, phase, size, index, hovered, selected, onEnter, onLeave, onClick,
 }: {
-  publication: Publication;
+  pub: Publication;
+  color: string;
+  orbitRadius: number;
+  speed: number;
+  phase: number;
+  size: number;
   index: number;
-  total: number;
-  resolvedTheme: string | undefined;
-  activeIndex: number | null;
-  setActiveIndex: (index: number | null) => void;
-  scrollOffset: number;
-  seed: number;
+  hovered: boolean;
+  selected: boolean;
+  onEnter: () => void;
+  onLeave: () => void;
+  onClick: () => void;
 }) {
   const groupRef = useRef<THREE.Group>(null);
-
-  const randA = useMemo(() => Math.sin(seed * 127.1) * 2 - 1, [seed]);
-  const randB = useMemo(() => Math.sin(seed * 311.7) * 2 - 1, [seed]);
-  const randC = useMemo(() => Math.sin(seed * 43.3) * 2 - 1, [seed]);
-  const floatSpeed = useMemo(() => 0.2 + Math.abs(randA) * 0.2, [randA]);
-  const floatPhase = useMemo(() => seed * 1.5, [seed]);
-
-  const accentColor = ACCENT_COLORS[index % ACCENT_COLORS.length];
+  const active = hovered || selected;
 
   useFrame(({ clock }) => {
     if (!groupRef.current) return;
-
-    const t = clock.getElapsedTime();
-    const baseRadius = 6.8;
-    const spiralRadius = baseRadius + randA * 1.5;
-    const angle = (index / total) * Math.PI * 2 * 2.5 + t * 0.022 + scrollOffset;
-
-    const x = Math.cos(angle) * spiralRadius;
-    const z = Math.sin(angle) * spiralRadius * 0.7;
-
-    const totalHeight = 18;
-    let y = ((index * (totalHeight / total) - scrollOffset * 8.5) % totalHeight);
-    if (y < -totalHeight / 2) y += totalHeight;
-    if (y > totalHeight / 2) y -= totalHeight;
-
-    const floatY = Math.sin(t * floatSpeed + floatPhase) * 0.1;
-    const floatX = Math.cos(t * floatSpeed * 0.5 + floatPhase) * 0.04;
-
-    groupRef.current.position.set(x + floatX, y + floatY, z);
-    groupRef.current.lookAt(0, y * 0.88, 0);
-
-    groupRef.current.rotation.z += randB * 0.08 + Math.sin(t * 0.15 + floatPhase) * 0.015;
-    groupRef.current.rotation.x += randC * 0.04 + Math.sin(t * 0.12 + floatPhase) * 0.01;
+    const t = clock.elapsedTime * speed + phase;
+    groupRef.current.position.x = orbitRadius * Math.cos(t);
+    groupRef.current.position.z = orbitRadius * Math.sin(t);
   });
+
+  const s = active ? 1.5 : 1;
 
   return (
     <group ref={groupRef}>
-      <PublicationCard
-        publication={publication}
-        resolvedTheme={resolvedTheme}
-        activeIndex={activeIndex}
-        setActiveIndex={setActiveIndex}
-        index={index}
-        accentColor={accentColor}
-      />
+      <group scale={[s, s, s]}>
+        <mesh onPointerEnter={onEnter} onPointerLeave={onLeave} onClick={onClick}>
+          <sphereGeometry args={[size, 14, 14]} />
+          <meshBasicMaterial color={color} />
+        </mesh>
+
+        {/* Planetary ring on every 3rd planet */}
+        {index % 3 === 0 && (
+          <mesh rotation={[Math.PI / 2.5, 0, 0]}>
+            <ringGeometry args={[size * 1.6, size * 1.9, 24]} />
+            <meshBasicMaterial color={color} transparent opacity={0.3} side={THREE.DoubleSide} depthWrite={false} />
+          </mesh>
+        )}
+      </group>
+
+      <Billboard>
+        <sprite scale={active ? size * 15 : size * 8}>
+          <spriteMaterial map={glowTex()} color={color} transparent opacity={active ? 0.7 : 0.3} blending={THREE.AdditiveBlending} depthWrite={false} />
+        </sprite>
+      </Billboard>
+
+      {hovered && (
+        <Billboard>
+          <Text
+            position={[0, size * 7 + 0.15, 0]}
+            fontSize={0.08}
+            color="#ffffff"
+            anchorX="center"
+            anchorY="bottom"
+            outlineWidth={0.015}
+            outlineColor="#000000"
+            maxWidth={2.0}
+          >
+            {pub.title.length > 45 ? pub.title.slice(0, 45) + "\u2026" : pub.title}
+          </Text>
+        </Billboard>
+      )}
     </group>
   );
 }
 
+/* ------------------------------------------------------------------ *
+ *  SolarSystemScene — all 3D content
+ * ------------------------------------------------------------------ */
+function SolarSystemScene({
+  publications, theme, selected, hovered, setHovered, onSelect, tourHighlight,
+}: {
+  publications: Publication[];
+  theme: ThemeName;
+  selected: number | null;
+  hovered: number | null;
+  setHovered: (i: number | null) => void;
+  onSelect: (i: number | null) => void;
+  tourHighlight: number | null;
+}) {
+  const env = ENV[theme];
+  const isDark = theme === "dark";
+  const effectiveHover = hovered ?? tourHighlight;
+
+  const orbits = useMemo(() => {
+    const count = publications.length;
+    return publications.map((_, i) => {
+      const orbitRadius = 0.6 + (i / Math.max(count - 1, 1)) * 3.4;
+      return {
+        orbitRadius,
+        speed: 0.3 / orbitRadius,
+        phase: (i / Math.max(count, 1)) * Math.PI * 2,
+        size: 0.04 + (i / Math.max(count, 1)) * 0.04,
+        tiltX: (seedRand(i * 3.1) - 0.5) * 0.12,
+        tiltZ: (seedRand(i * 7.3) - 0.5) * 0.12,
+      };
+    });
+  }, [publications]);
+
+  const colors = isDark ? DARK_COLORS : LIGHT_COLORS;
+  const ringBase = isDark ? 0.18 : 0.28;
+
+  return (
+    <>
+      <fog attach="fog" args={[env.bg, env.fogNear, env.fogFar]} />
+
+      <ResearchParticles isDark={isDark} color={env.particles} opacity={env.particleOpacity} />
+
+      <ambientLight intensity={isDark ? 0.4 : 0.35} />
+      <pointLight position={[0, 0, 0]} intensity={0.6} color={isDark ? "#ffcc80" : "#ffecb3"} />
+
+      <CentralStar theme={theme} />
+
+      {publications.map((pub, i) => {
+        const o = orbits[i];
+        const color = colors[i % colors.length];
+        const isHov = effectiveHover === i;
+        const isSel = selected === i;
+
+        return (
+          <group key={i} rotation={[o.tiltX, 0, o.tiltZ]}>
+            <OrbitRing radius={o.orbitRadius} color={color} opacity={isHov || isSel ? ringBase + 0.22 : ringBase} />
+            <Planet
+              pub={pub}
+              color={color}
+              orbitRadius={o.orbitRadius}
+              speed={o.speed}
+              phase={o.phase}
+              size={o.size}
+              index={i}
+              hovered={isHov}
+              selected={isSel}
+              onEnter={() => setHovered(i)}
+              onLeave={() => setHovered(null)}
+              onClick={() => onSelect(i === selected ? null : i)}
+            />
+          </group>
+        );
+      })}
+
+        <OrbitControls
+        autoRotate
+        autoRotateSpeed={0.3}
+        enableDamping
+        dampingFactor={0.06}
+        enableZoom={false}
+        enablePan={false}
+      />
+    </>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ *  InfoPanel — HTML overlay for selected publication
+ * ------------------------------------------------------------------ */
+function InfoPanel({
+  publication,
+  onClose,
+}: {
+  publication: Publication | null;
+  onClose: () => void;
+}) {
+  if (!publication) return null;
+
+  return (
+    <div
+      className="pointer-events-auto absolute right-6 top-6 z-20 w-72 rounded-xl border border-zinc-700/50 bg-zinc-950/90 p-5 backdrop-blur-lg transition-all duration-300"
+      style={{ boxShadow: "0 0 30px rgba(0,0,0,0.5)" }}
+    >
+      <button
+        onClick={onClose}
+        className="absolute right-3 top-3 text-zinc-500 transition-colors hover:text-white"
+        aria-label="Close"
+      >
+        ✕
+      </button>
+
+      <h3 className="mb-2 pr-4 text-sm font-semibold leading-snug text-white">
+        {publication.title}
+      </h3>
+
+      {publication.venue && (
+        <p className="mb-1 text-xs text-zinc-400">{publication.venue}</p>
+      )}
+
+      {publication.year && (
+        <p className="mb-3 text-xs text-zinc-500">{publication.year}</p>
+      )}
+
+      {publication.url && (
+        <a
+          href={publication.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-block rounded-lg bg-emerald-500/20 px-3 py-1.5 text-xs font-medium text-emerald-400 transition-colors hover:bg-emerald-500/30"
+        >
+          Read more →
+        </a>
+      )}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ *  ResearchCanvas — main exported component
+ * ------------------------------------------------------------------ */
 export default function ResearchCanvas({
   publications,
 }: {
   publications: Publication[];
 }) {
   const { resolvedTheme } = useTheme();
-
-  const [activeIndex, setActiveIndex] = useState<number | null>(null);
-  const [scrollOffset, setScrollOffset] = useState(0);
-
-  const displayCount = 12;
-  const seeds = useMemo(
-    () => Array.from({ length: displayCount }).map((_, i) => i * 2.381966),
-    []
+  const mounted = useSyncExternalStore(
+    useCallback(() => () => {}, []),
+    () => true,
+    () => false,
   );
 
-  // State to hold theme after client hydration
-  const [clientTheme, setClientTheme] = useState<string | undefined>(undefined);
+  const theme: ThemeName =
+    mounted && ["dark", "light", "forest"].includes(resolvedTheme ?? "")
+      ? (resolvedTheme as ThemeName)
+      : "light";
 
-  // Sync resolvedTheme to clientTheme after mount to avoid SSR mismatch
+  const env = ENV[theme];
+  const [selected, setSelected] = useState<number | null>(null);
+  const [hovered, setHovered] = useState<number | null>(null);
+  const [tourHighlight, setTourHighlight] = useState<number | null>(null);
+  const [hintVisible, setHintVisible] = useState(true);
+  const [hintFading, setHintFading] = useState(false);
+  const displayPubs = useMemo(() => publications.slice(0, 12), [publications]);
+
+  const userInteracted = useRef(false);
+
+  // Intro tour
   useEffect(() => {
-    setClientTheme(resolvedTheme);
-  }, [resolvedTheme]);
+    if (displayPubs.length === 0 || userInteracted.current) return;
 
-  // Helper to determine if we have a valid client theme
-  const hasClientTheme = Boolean(clientTheme);
+    const showDelay = setTimeout(() => setHintFading(true), 2000);
 
-  // Use clientTheme for calculations; fallback to light defaults for server render
-  const effectiveTheme = clientTheme ?? "light";
+    const tourDelay = setTimeout(() => {
+      setHintVisible(false);
+      let idx = 0;
+      const tick = () => {
+        if (userInteracted.current || idx >= displayPubs.length) {
+          setTourHighlight(null);
+          return;
+        }
+        setTourHighlight(idx);
+        idx++;
+        setTimeout(tick, 2200);
+      };
+      setTimeout(tick, 600);
+    }, 2500);
 
-  // 1. WebGL fog + backdrop color, matched EXACTLY to the page background per theme.
-  //    forest -> #f2f7f4, dark -> pure black, light -> pure white.
-  const environmentColor = useMemo(() => {
-    if (effectiveTheme === "dark") return "#000000";
-    if (effectiveTheme === "forest") return "#f2f7f4";
-    return "#ffffff"; // light
-  }, [effectiveTheme]);
+    const hideHint = setTimeout(() => setHintVisible(false), 4000);
 
-  // 2. Inline edge-fade gradients. Each fades from the exact backdrop tone to the SAME
-  //    RGB at zero alpha (`${c}00`) rather than CSS `transparent`. `transparent` is
-  //    rgba(0,0,0,0) — transparent *black* — so fading to it pushes the midtones toward
-  //    gray and leaves a visible band on light themes. Appending the alpha byte keeps
-  //    the gradient true to the backdrop all the way down, so the edges truly dissolve.
-  const edgeFades = useMemo(() => {
-    const c = environmentColor; // clean 6-digit hex
-    const fade = `${c}00`; // same RGB, alpha 0
-    return {
-      top: `linear-gradient(to bottom, ${c} 0%, ${fade} 100%)`,
-      bottom: `linear-gradient(to top, ${c} 0%, ${fade} 100%)`,
-      left: `linear-gradient(to right, ${c} 0%, ${fade} 100%)`,
-      right: `linear-gradient(to left, ${c} 0%, ${fade} 100%)`,
-    };
-  }, [environmentColor]);
+    return () => { clearTimeout(showDelay); clearTimeout(tourDelay); clearTimeout(hideHint); };
+  }, [displayPubs.length]);
 
-  const isDark = effectiveTheme === "dark";
-  const isForest = effectiveTheme === "forest";
+  const handleHover = useCallback((i: number | null) => {
+    userInteracted.current = true;
+    setTourHighlight(null);
+    setHintVisible(false);
+    setHovered(i);
+  }, []);
+
+  const handleSelect = useCallback((i: number | null) => {
+    userInteracted.current = true;
+    setTourHighlight(null);
+    setHintVisible(false);
+    setSelected(i);
+  }, []);
 
   return (
     <div
-      className="relative h-[740px] w-full overflow-hidden"
-      // Solid backdrop in the exact theme color. The canvas is alpha-transparent and
-      // sits on top, so all empty space, the fog, and the edge fades resolve to this
-      // same color — the region reads as one seamless field with no visible box edge.
-      style={{ backgroundColor: environmentColor }}
+      className="relative h-[480px] w-full overflow-hidden"
+      style={{ backgroundColor: env.bg, touchAction: "pan-y" }}
     >
-      {/* Conditional rendering: only render Canvas after client theme is known to avoid hydration mismatch */}
-      {hasClientTheme && (
+      {mounted && (
         <>
-          {/* Edge fades on all four sides, in every theme, so cards dissolve into the
-              backdrop instead of being hard-cut at the canvas boundary. */}
-          <div
-            className="absolute top-0 left-0 right-0 z-10 h-28 pointer-events-none"
-            style={{ background: edgeFades.top }}
-          />
-          <div
-            className="absolute left-0 top-0 bottom-0 z-10 w-28 pointer-events-none"
-            style={{ background: edgeFades.left }}
-          />
-          <div
-            className="absolute right-0 top-0 bottom-0 z-10 w-28 pointer-events-none"
-            style={{ background: edgeFades.right }}
-          />
+          {/* Edge fades */}
+          <div className="pointer-events-none absolute left-0 right-0 top-0 z-10 h-16"
+            style={{ background: `linear-gradient(to bottom, ${env.bg} 0%, ${env.bg}00 100%)` }} />
+          <div className="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-16"
+            style={{ background: `linear-gradient(to top, ${env.bg} 0%, ${env.bg}00 100%)` }} />
+          <div className="pointer-events-none absolute left-0 top-0 bottom-0 z-10 w-16"
+            style={{ background: `linear-gradient(to right, ${env.bg} 0%, ${env.bg}00 100%)` }} />
+          <div className="pointer-events-none absolute right-0 top-0 bottom-0 z-10 w-16"
+            style={{ background: `linear-gradient(to left, ${env.bg} 0%, ${env.bg}00 100%)` }} />
 
           <Canvas
             dpr={[1, 1.5]}
-            camera={{ position: [0, 0, 13.5], fov: 38 }}
+            camera={{ position: [0, 1.5, 6.5], fov: 50 }}
             gl={{ antialias: true, alpha: true }}
           >
-            {/* Fog now matches the backdrop in every theme so distant cards fade into the
-                background: black in dark, leafy-light in forest, white in light. */}
-            <fog attach="fog" args={[environmentColor, 11, 24]} />
-            <ResearchParticles isDark={isDark} />
-            <ambientLight intensity={isDark ? 0.95 : isForest ? 1.3 : 1.4} />
-            <pointLight position={[0, 5, 5]} intensity={isDark ? 1.8 : 1.0} color="#ffffff" />
-            <pointLight position={[-10, 3, 2]} intensity={0.6} color={isForest ? "#10b981" : "#6366F1"} />
-            <pointLight position={[10, -3, 2]} intensity={0.6} color="#00FF87" />
-            <directionalLight position={[0, 10, 3]} intensity={isDark ? 0.5 : 0.8} />
-            {publications.slice(0, displayCount).map((pub, index) => (
-              <FloatingPublication
-                key={index}
-                publication={pub}
-                index={index}
-                total={Math.min(publications.length, displayCount)}
-                resolvedTheme={effectiveTheme}
-                activeIndex={activeIndex}
-                setActiveIndex={setActiveIndex}
-                scrollOffset={scrollOffset}
-                seed={seeds[index]}
-              />
-            ))}
+            <SolarSystemScene
+              publications={displayPubs}
+              theme={theme}
+              selected={selected}
+              hovered={hovered}
+              setHovered={handleHover}
+              onSelect={handleSelect}
+              tourHighlight={tourHighlight}
+            />
           </Canvas>
 
-          {/* Bottom fade (correct upward direction in all themes, including dark) */}
-          <div
-            className="absolute bottom-0 left-0 right-0 z-10 h-28 pointer-events-none"
-            style={{ background: edgeFades.bottom }}
+          <InfoPanel
+            publication={selected !== null ? displayPubs[selected] : null}
+            onClose={() => setSelected(null)}
           />
+
+          {hintVisible && (
+            <div className={`absolute inset-0 z-20 flex items-center justify-center pointer-events-none transition-opacity duration-700 ${
+              hintFading ? "opacity-0" : "opacity-100"
+            }`}>
+              <div className={`text-center ${env.hintColor}`}>
+                <p className="font-mono text-base font-semibold tracking-widest">
+                  ✦ Explore My Research
+                </p>
+                <p className="mt-2 font-mono text-xs tracking-wide opacity-60">
+                  Hover the planets to see each publication
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Scroll-down button */}
+          <button
+            onClick={() => window.scrollBy({ top: window.innerHeight, behavior: "smooth" })}
+            className="absolute bottom-4 left-1/2 z-30 -translate-x-1/2 cursor-pointer transition-opacity hover:opacity-100 motion-safe:animate-bounce"
+            style={{ opacity: 0.3 }}
+            aria-label="Scroll to next section"
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+              className={theme === "dark" ? "text-zinc-400" : "text-zinc-500"}
+            >
+              <path d="M7 13l5 5 5-5" />
+              <path d="M7 6l5 5 5-5" />
+            </svg>
+          </button>
         </>
       )}
     </div>

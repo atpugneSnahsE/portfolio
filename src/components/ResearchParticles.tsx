@@ -6,8 +6,12 @@ import * as THREE from "three";
 
 export default function ResearchParticles({
   isDark,
+  color,
+  opacity,
 }: {
   isDark: boolean;
+  color?: string;
+  opacity?: number;
 }) {
   const points1 = useRef<THREE.Points>(null);
   const points2 = useRef<THREE.Points>(null);
@@ -30,7 +34,13 @@ export default function ResearchParticles({
     }
 
     return [positions1, positions2];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const c1 = color ?? (isDark ? "#34D399" : "#059669");
+  const c2 = color ?? (isDark ? "#6ee7b7" : "#047857");
+  const o1 = opacity ?? (isDark ? 0.65 : 0.55);
+  const o2 = opacity ?? (isDark ? 0.55 : 0.45);
 
   useFrame((state) => {
     const elapsedTime = state.clock.elapsedTime;
@@ -48,7 +58,6 @@ export default function ResearchParticles({
 
   return (
     <group>
-      {/* Outer slow-spinning particle cloud */}
       <points ref={points1}>
         <bufferGeometry>
           <bufferAttribute
@@ -58,16 +67,15 @@ export default function ResearchParticles({
         </bufferGeometry>
         <pointsMaterial
           size={0.065}
-          color={isDark ? "#34D399" : "#059669"}
+          color={c1}
           transparent
-          opacity={isDark ? 0.65 : 0.55}
+          opacity={o1}
           sizeAttenuation
           depthWrite={false}
           blending={THREE.AdditiveBlending}
         />
       </points>
 
-      {/* Inner fast-reverse spinning cloud for fluid depth parallax */}
       <points ref={points2}>
         <bufferGeometry>
           <bufferAttribute
@@ -77,9 +85,9 @@ export default function ResearchParticles({
         </bufferGeometry>
         <pointsMaterial
           size={0.075}
-          color={isDark ? "#6ee7b7" : "#047857"}
+          color={c2}
           transparent
-          opacity={isDark ? 0.55 : 0.45}
+          opacity={o2}
           sizeAttenuation
           depthWrite={false}
           blending={THREE.AdditiveBlending}
