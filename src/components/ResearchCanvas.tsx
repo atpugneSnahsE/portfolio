@@ -24,15 +24,21 @@ type ThemeName = "dark" | "light" | "forest";
  *  Planet colour palette
  * ------------------------------------------------------------------ */
 const DARK_COLORS = [
-  "#FF6B6B", "#4ECDC4", "#FFE66D", "#A8E6CF",
-  "#FF8A5C", "#7C4DFF", "#FF4081", "#00BCD4",
-  "#CDDC39", "#E91E63", "#3F51B5", "#FF9800",
+  "#FF9999", "#7FF5E8", "#FFF59D", "#C8F7DC",
+  "#FFB088", "#B388FF", "#FF80AB", "#4DD0E1",
+  "#E6EE9C", "#F48FB1", "#7986CB", "#FFB74D",
 ];
 
 const LIGHT_COLORS = [
+  "#B71C1C", "#004D40", "#F57F17", "#1B5E20",
+  "#BF360C", "#311B92", "#880E4F", "#006064",
+  "#827717", "#6A1B9A", "#1A237E", "#E65100",
+];
+
+const FOREST_COLORS = [
   "#C62828", "#00695C", "#F9A825", "#2E7D32",
-  "#E65100", "#4527A0", "#AD1457", "#00838F",
-  "#9E9D24", "#880E4F", "#283593", "#EF6C00",
+  "#D84315", "#4527A0", "#AD1457", "#00838F",
+  "#9E9D24", "#7B1FA2", "#283593", "#EF6C00",
 ];
 
 /* ------------------------------------------------------------------ *
@@ -228,7 +234,7 @@ function SolarSystemScene({
     });
   }, [publications]);
 
-  const colors = isDark ? DARK_COLORS : LIGHT_COLORS;
+  const colors = isDark ? DARK_COLORS : theme === "forest" ? FOREST_COLORS : LIGHT_COLORS;
   const ringBase = isDark ? 0.18 : 0.28;
 
   return (
@@ -287,35 +293,67 @@ function SolarSystemScene({
 function InfoPanel({
   publication,
   onClose,
+  theme,
 }: {
   publication: Publication | null;
   onClose: () => void;
+  theme: ThemeName;
 }) {
   if (!publication) return null;
 
+  const forest = theme === "forest";
+
   return (
     <div
-      className="pointer-events-auto absolute right-6 top-6 z-20 w-72 rounded-xl border border-zinc-700/50 bg-zinc-950/90 p-5 backdrop-blur-lg transition-all duration-300"
-      style={{ boxShadow: "0 0 30px rgba(0,0,0,0.5)" }}
+      className={`pointer-events-auto absolute right-4 sm:right-6 top-6 z-20 w-[calc(100vw-32px)] sm:w-72 rounded-xl border p-5 backdrop-blur-lg transition-all duration-300 ${
+        forest
+          ? "border-emerald-200/60 bg-white/90"
+          : "border-zinc-700/50 bg-zinc-950/90"
+      }`}
+      style={{
+        boxShadow: forest
+          ? "0 0 30px rgba(0,0,0,0.08)"
+          : "0 0 30px rgba(0,0,0,0.5)",
+      }}
     >
       <button
         onClick={onClose}
-        className="absolute right-3 top-3 text-zinc-500 transition-colors hover:text-white"
+        className={`absolute right-3 top-3 transition-colors ${
+          forest
+            ? "text-zinc-400 hover:text-zinc-700"
+            : "text-zinc-500 hover:text-white"
+        }`}
         aria-label="Close"
       >
         ✕
       </button>
 
-      <h3 className="mb-2 pr-4 text-sm font-semibold leading-snug text-white">
+      <h3
+        className={`mb-2 pr-4 text-sm font-semibold leading-snug ${
+          forest ? "text-emerald-900" : "text-white"
+        }`}
+      >
         {publication.title}
       </h3>
 
       {publication.venue && (
-        <p className="mb-1 text-xs text-zinc-400">{publication.venue}</p>
+        <p
+          className={`mb-1 text-xs ${
+            forest ? "text-emerald-700" : "text-zinc-400"
+          }`}
+        >
+          {publication.venue}
+        </p>
       )}
 
       {publication.year && (
-        <p className="mb-3 text-xs text-zinc-500">{publication.year}</p>
+        <p
+          className={`mb-3 text-xs ${
+            forest ? "text-emerald-600" : "text-zinc-500"
+          }`}
+        >
+          {publication.year}
+        </p>
       )}
 
       {publication.url && (
@@ -323,7 +361,11 @@ function InfoPanel({
           href={publication.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-block rounded-lg bg-emerald-500/20 px-3 py-1.5 text-xs font-medium text-emerald-400 transition-colors hover:bg-emerald-500/30"
+          className={`inline-block rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+            forest
+              ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
+              : "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
+          }`}
         >
           Read more →
         </a>
@@ -438,6 +480,7 @@ export default function ResearchCanvas({
           <InfoPanel
             publication={selected !== null ? displayPubs[selected] : null}
             onClose={() => setSelected(null)}
+            theme={theme}
           />
 
           {hintVisible && (

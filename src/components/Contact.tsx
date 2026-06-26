@@ -22,9 +22,9 @@ export default function Contact() {
         {/* Left Side */}
         <div
           className="
-            rounded-[2rem]
+            rounded-2xl sm:rounded-[2rem]
             border
-            p-8
+            p-6 sm:p-8
 
             border-zinc-200
             bg-white/70
@@ -34,8 +34,8 @@ export default function Contact() {
             dark:bg-[#0B0C0E]
           "
         >
-          <div className="mb-8">
-            <h3 className="mb-3 text-3xl font-semibold text-zinc-900 dark:text-white">
+          <div className="mb-6 sm:mb-8">
+            <h3 className="mb-3 text-2xl sm:text-3xl font-semibold text-zinc-900 dark:text-white">
               Let’s build something useful
             </h3>
 
@@ -124,9 +124,9 @@ export default function Contact() {
         {/* Right Side */}
         <div
           className="
-            rounded-[2rem]
+            rounded-2xl sm:rounded-[2rem]
             border
-            p-8
+            p-6 sm:p-8
 
             border-zinc-200
             bg-white/70
@@ -136,18 +136,18 @@ export default function Contact() {
             dark:bg-[#0B0C0E]
           "
         >
-          <h3 className="mb-6 text-2xl font-semibold text-zinc-900 dark:text-white">
+          <h3 className="mb-6 text-xl sm:text-2xl font-semibold text-zinc-900 dark:text-white">
             Connect
           </h3>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4">
             <a
               href="https://linkedin.com/in/eshansengupta"
               target="_blank"
-              className="group rounded-2xl border border-zinc-200 p-5 transition hover:border-emerald-500 dark:border-zinc-800"
+              className="group rounded-2xl border border-zinc-200 p-4 sm:p-5 transition hover:border-emerald-500 dark:border-zinc-800"
             >
-              <FaLinkedinIn className="mb-3 h-6 w-6 text-emerald-500" />
-              <p className="font-medium dark:text-white">
+              <FaLinkedinIn className="mb-3 h-5 w-5 sm:h-6 sm:w-6 text-emerald-500" />
+              <p className="font-medium text-sm sm:text-base dark:text-white break-words">
                 LinkedIn
               </p>
             </a>
@@ -155,10 +155,10 @@ export default function Contact() {
             <a
               href="https://github.com/atpugneSnahsE"
               target="_blank"
-              className="group rounded-2xl border border-zinc-200 p-5 transition hover:border-emerald-500 dark:border-zinc-800"
+              className="group rounded-2xl border border-zinc-200 p-4 sm:p-5 transition hover:border-emerald-500 dark:border-zinc-800"
             >
-              <FaGithub className="mb-3 h-6 w-6 text-emerald-500" />
-              <p className="font-medium dark:text-white">
+              <FaGithub className="mb-3 h-5 w-5 sm:h-6 sm:w-6 text-emerald-500" />
+              <p className="font-medium text-sm sm:text-base dark:text-white break-words">
                 GitHub
               </p>
             </a>
@@ -166,10 +166,10 @@ export default function Contact() {
             <a
               href="https://orcid.org/0000-0002-6285-7654"
               target="_blank"
-              className="group rounded-2xl border border-zinc-200 p-5 transition hover:border-emerald-500 dark:border-zinc-800"
+              className="group rounded-2xl border border-zinc-200 p-4 sm:p-5 transition hover:border-emerald-500 dark:border-zinc-800"
             >
-              <FileText className="mb-3 h-6 w-6 text-emerald-500" />
-              <p className="font-medium dark:text-white">
+              <FileText className="mb-3 h-5 w-5 sm:h-6 sm:w-6 text-emerald-500" />
+              <p className="font-medium text-sm sm:text-base dark:text-white break-words">
                 ORCID
               </p>
             </a>
@@ -177,10 +177,10 @@ export default function Contact() {
             <a
               href="https://twitter.com/_eshansengupta"
               target="_blank"
-              className="group rounded-2xl border border-zinc-200 p-5 transition hover:border-emerald-500 dark:border-zinc-800"
+              className="group rounded-2xl border border-zinc-200 p-4 sm:p-5 transition hover:border-emerald-500 dark:border-zinc-800"
             >
-              <FaXTwitter className="mb-3 h-6 w-6 text-emerald-500" />
-              <p className="font-medium dark:text-white">
+              <FaXTwitter className="mb-3 h-5 w-5 sm:h-6 sm:w-6 text-emerald-500" />
+              <p className="font-medium text-sm sm:text-base dark:text-white break-words">
                 X / Twitter
               </p>
             </a>
@@ -188,10 +188,10 @@ export default function Contact() {
             <a
               href="https://instagram.com/eshansengupta.me"
               target="_blank"
-              className="group rounded-2xl border border-zinc-200 p-5 transition hover:border-emerald-500 dark:border-zinc-800"
+              className="group rounded-2xl border border-zinc-200 p-4 sm:p-5 transition hover:border-emerald-500 dark:border-zinc-800"
             >
-              <FaInstagram className="mb-3 h-6 w-6 text-emerald-500" />
-              <p className="font-medium dark:text-white">
+              <FaInstagram className="mb-3 h-5 w-5 sm:h-6 sm:w-6 text-emerald-500" />
+              <p className="font-medium text-sm sm:text-base dark:text-white break-words">
                 Instagram
               </p>
             </a>

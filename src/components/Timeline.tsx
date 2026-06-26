@@ -75,8 +75,8 @@ function TimelineCard({
   return (
     <div
       className="
-        rounded-[2rem]
-        border p-7
+        rounded-2xl sm:rounded-[2rem]
+        border p-5 sm:p-7
         transition-all duration-500
 
         border-zinc-200
@@ -93,7 +93,7 @@ function TimelineCard({
         {item.year}
       </p>
 
-      <h3 className="mb-3 text-xl font-semibold text-zinc-900 dark:text-white">
+      <h3 className="mb-3 text-lg sm:text-xl font-semibold text-zinc-900 dark:text-white">
         {item.title}
       </h3>
 
@@ -129,7 +129,7 @@ function TimelineCard({
 export default function Timeline() {
   return (
     <Section title="Research & Experience">
-      <div className="grid gap-14 lg:grid-cols-[1fr_auto_1fr]">
+      <div className="grid gap-10 md:gap-14 lg:grid-cols-[1fr_auto_1fr]">
 
         {/* Academic */}
         <div>

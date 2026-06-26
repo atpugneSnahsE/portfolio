@@ -16,9 +16,9 @@ export default function Resume() {
         {/* Left Side */}
         <div
           className="
-            rounded-[2rem]
+            rounded-2xl sm:rounded-[2rem]
             border
-            p-8
+            p-6 sm:p-8
 
             border-zinc-200
             bg-white/70
@@ -28,13 +28,13 @@ export default function Resume() {
             dark:bg-[#0B0C0E]
           "
         >
-          <div className="mb-8 flex items-start justify-between gap-6">
+          <div className="mb-6 sm:mb-8 flex items-start justify-between gap-6">
             <div>
               <p className="mb-3 text-sm uppercase tracking-[0.25em] text-emerald-500">
                 Professional Profile
               </p>
 
-              <h3 className="mb-4 text-4xl font-semibold text-zinc-900 dark:text-white">
+              <h3 className="mb-4 text-2xl sm:text-3xl lg:text-4xl font-semibold text-zinc-900 dark:text-white">
                 Eshan Sengupta
               </h3>
 
@@ -96,9 +96,9 @@ export default function Resume() {
         <div
           className="
             flex flex-col justify-between
-            rounded-[2rem]
+            rounded-2xl sm:rounded-[2rem]
             border
-            p-8
+            p-6 sm:p-8
 
             border-zinc-200
             bg-white/70
@@ -113,7 +113,7 @@ export default function Resume() {
               Resume Access
             </p>
 
-            <h3 className="mb-4 text-2xl font-semibold text-zinc-900 dark:text-white">
+            <h3 className="mb-4 text-xl sm:text-2xl font-semibold text-zinc-900 dark:text-white">
               Download CV
             </h3>
 

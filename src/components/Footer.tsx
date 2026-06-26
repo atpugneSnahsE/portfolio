@@ -219,7 +219,7 @@ export default function Footer() {
               {showOutput && (
                 <div className={`mt-1 flex gap-2 ${s.text}`}>
                   <span className="select-none opacity-40">&rarr;</span>
-                  <span>{current.output}</span>
+                  <span className="break-words">{current.output}</span>
                 </div>
               )}
             </div>

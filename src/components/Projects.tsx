@@ -42,18 +42,24 @@ export default async function Projects() {
                 key={index}
                 className="
                   group
-                  min-w-[420px]
-                  max-w-[420px]
-                  min-h-[420px]
+                  min-w-[80vw]
+                  max-w-[80vw]
+                  sm:min-w-[380px]
+                  sm:max-w-[380px]
+                  md:min-w-[420px]
+                  md:max-w-[420px]
+                  min-h-[300px]
+                  sm:min-h-[380px]
+                  md:min-h-[420px]
                   snap-center
 
                   flex
                   flex-col
                   justify-between
 
-                  rounded-[2rem]
+                  rounded-2xl sm:rounded-[2rem]
                   border
-                  p-8
+                  p-5 sm:p-6 md:p-8
                   transition-all
                   duration-500
                   will-change-transform

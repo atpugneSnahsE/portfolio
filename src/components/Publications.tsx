@@ -53,13 +53,15 @@ export default async function Publications() {
                 className={`
                   group
                   flex
-                  min-w-[380px]
+                  min-w-[80vw]
+                  max-w-[80vw]
+                  sm:min-w-[380px]
                   flex-col
                   snap-center
 
-                  rounded-[2rem]
+                  rounded-2xl sm:rounded-[2rem]
                   border
-                  p-7
+                  p-5 sm:p-6 md:p-7
                   transition-all
                   duration-500
 

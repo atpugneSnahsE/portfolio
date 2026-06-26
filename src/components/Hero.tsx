@@ -35,8 +35,8 @@ const VesselCanvas = dynamic(
 
 export default function Hero() {
   return (
-    <section className="mx-auto flex min-h-screen max-w-7xl items-center px-8 pt-20">
-      <div className="grid w-full grid-cols-1 gap-16 lg:grid-cols-2">
+    <section className="mx-auto flex min-h-screen max-w-7xl items-center px-6 md:px-8 pt-16 md:pt-20">
+      <div className="grid w-full grid-cols-1 gap-10 md:gap-16 lg:grid-cols-2">
         {/* LEFT */}
         <FadeIn>
           <div className="flex flex-col justify-center">
@@ -47,13 +47,12 @@ export default function Hero() {
             <h1
               className="
                 mb-6
-                text-5xl
+                text-4xl sm:text-5xl md:text-7xl
                 font-bold
-                leading-[0.95]
+                leading-tight sm:leading-[0.95]
                 tracking-tight
                 text-zinc-900
                 dark:text-white
-                md:text-7xl
               "
             >
               Eshan
@@ -65,8 +64,8 @@ export default function Hero() {
               className="
                 mb-10
                 max-w-xl
-                text-lg
-                leading-9
+                text-base sm:text-lg
+                leading-7 sm:leading-9
                 text-zinc-600
                 dark:text-zinc-400
               "
@@ -205,7 +204,7 @@ export default function Hero() {
 
         {/* RIGHT */}
         <FadeIn delay={0.2} y={50}>
-          <div className="flex h-full min-h-[600px] items-center justify-center">
+          <div className="flex h-full min-h-[350px] md:min-h-[500px] lg:min-h-[600px] items-center justify-center">
             <VesselCanvas />
           </div>
         </FadeIn>

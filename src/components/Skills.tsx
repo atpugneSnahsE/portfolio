@@ -93,9 +93,9 @@ export default function Skills() {
               <div
                 className="
                   group
-                  rounded-[2rem]
+                  rounded-2xl sm:rounded-[2rem]
                   border
-                  p-8
+                  p-6 sm:p-8
                   backdrop-blur-xl
                   transition-all
                   duration-500

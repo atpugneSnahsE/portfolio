@@ -1,6 +1,12 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "@/components/ThemeProvider";
+import ForestBackground from "@/components/ForestBackground";
+import Header from "@/components/Header";
+import CustomCursor from "@/components/CustomCursor";
+import LoadingScreen from "@/components/LoadingScreen";
+import LerpScroll from "@/components/LerpScroll";
+import Chatbot from "@/components/Chatbot/Chatbot";
 
 export const metadata: Metadata = {
   title: "Eshan Sengupta",
@@ -20,7 +26,15 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body>
         <Providers>
-          {children}
+          <LoadingScreen>
+            <ForestBackground />
+            <CustomCursor />
+            <Header />
+            <LerpScroll>
+              {children}
+            </LerpScroll>
+            <Chatbot />
+          </LoadingScreen>
         </Providers>
       </body>
     </html>
