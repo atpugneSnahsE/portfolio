@@ -24,18 +24,6 @@ export default function Section({
     >
       {title && (
         <div className="mb-8 md:mb-10">
-          <p
-            className="
-              mb-2
-              text-xs
-              uppercase
-              tracking-[0.25em]
-              text-emerald-500
-            "
-          >
-            // SECTION
-          </p>
-
           <h2
             className="
               text-3xl

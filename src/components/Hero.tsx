@@ -161,9 +161,8 @@ export default function Hero() {
 
             {/* buttons */}
             <div className="flex flex-wrap gap-4">
-              <a
-                href="/resume.html"
-                rel="noopener noreferrer"
+              <button
+                onClick={() => window.location.href = "/resume.html"}
                 className="
                   rounded-2xl
                   bg-emerald-500
@@ -175,15 +174,14 @@ export default function Hero() {
                   duration-300
                   hover:scale-105
                   hover:shadow-[0_0_40px_rgba(16,185,129,0.25)]
+                  cursor-pointer
                 "
               >
                 Resume
-              </a>
+              </button>
 
-              <a
-                href="https://linkedin.com/in/eshansengupta"
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                onClick={() => window.location.href = "https://linkedin.com/in/eshansengupta"}
                 className="
                   rounded-2xl
                   border
@@ -196,10 +194,11 @@ export default function Hero() {
                   hover:border-emerald-500
                   hover:text-emerald-500
                   dark:border-zinc-700
+                  cursor-pointer
                 "
               >
                 LinkedIn
-              </a>
+              </button>
             </div>
           </div>
         </FadeIn>

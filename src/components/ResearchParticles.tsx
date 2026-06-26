@@ -4,6 +4,45 @@ import { useRef, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
+let _starTex: THREE.CanvasTexture | null = null;
+function starTexture() {
+  if (_starTex) return _starTex;
+  const size = 64;
+  const c = document.createElement("canvas");
+  c.width = c.height = size;
+  const ctx = c.getContext("2d")!;
+  const cx = size / 2, cy = size / 2;
+
+  // Soft glow base
+  const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, size / 2);
+  g.addColorStop(0, "rgba(255,255,255,1)");
+  g.addColorStop(0.1, "rgba(255,255,255,0.5)");
+  g.addColorStop(0.5, "rgba(255,255,255,0.05)");
+  g.addColorStop(1, "rgba(255,255,255,0)");
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, size, size);
+
+  // 4-point star spikes
+  ctx.fillStyle = "rgba(255,255,255,0.8)";
+  ctx.beginPath();
+  const spikes = 4;
+  const outerR = size / 2 - 2;
+  const innerR = 5;
+  for (let i = 0; i < spikes * 2; i++) {
+    const r = i % 2 === 0 ? outerR : innerR;
+    const angle = (i * Math.PI) / spikes - Math.PI / 2;
+    const x = cx + Math.cos(angle) * r;
+    const y = cy + Math.sin(angle) * r;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.closePath();
+  ctx.fill();
+
+  _starTex = new THREE.CanvasTexture(c);
+  return _starTex;
+}
+
 export default function ResearchParticles({
   isDark,
   color,
@@ -15,6 +54,8 @@ export default function ResearchParticles({
 }) {
   const points1 = useRef<THREE.Points>(null);
   const points2 = useRef<THREE.Points>(null);
+
+  const map = useMemo(() => starTexture(), []);
 
   const particleCount = 1200;
 
@@ -66,7 +107,8 @@ export default function ResearchParticles({
           />
         </bufferGeometry>
         <pointsMaterial
-          size={0.065}
+          size={0.09}
+          map={map}
           color={c1}
           transparent
           opacity={o1}
@@ -84,7 +126,8 @@ export default function ResearchParticles({
           />
         </bufferGeometry>
         <pointsMaterial
-          size={0.075}
+          size={0.1}
+          map={map}
           color={c2}
           transparent
           opacity={o2}

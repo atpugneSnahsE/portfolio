@@ -6,7 +6,7 @@ const academic = [
     year: "2025 – Present",
     title: "M.Sc. in Artificial Intelligence Systems",
     description:
-      "Vilnius Tech • GPA: 9.5/10",
+      "Vilnius Tech • GPA: 9.75/10",
     tags: [
       "LiDAR",
       "Computer Vision",

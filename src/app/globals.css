@@ -94,3 +94,14 @@ html.forest .text-zinc-500 {
 html.forest .text-emerald-500 {
   color: #10b981 !important;
 }
+
+/* Forest hover effects — override !important base so hovers are visible */
+html.forest .hover\:border-emerald-500:hover,
+html.forest .hover\:border-emerald-500\/40:hover,
+html.forest .hover\:border-emerald-500\/30:hover {
+  border-color: rgba(16, 185, 129, 0.6) !important;
+}
+
+html.forest .hover\:bg-emerald-500\/30:hover {
+  background-color: rgba(16, 185, 129, 0.15) !important;
+}
