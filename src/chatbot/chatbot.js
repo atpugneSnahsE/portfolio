@@ -1,36 +1,26 @@
 /**
- * Eshan's Portfolio Chatbot - Smart AI Assistant
- * Powered by Google Gemini API
+ * Eshan's Portfolio Chatbot
+ * Backed by local knowledge base retrieval (no external API required)
  */
 
 class PortfolioChatbot {
   constructor() {
     this.isInitialized = false;
     this.conversationHistory = [];
-    this.API_URL = "https://portfolio-wxry.onrender.com/api/chat"; // Added /api/chat path
+    this.API_URL = "/api/chat";
     this.init();
   }
 
   async init() {
     try {
-      // Check if we are in production
-      if (
-        window.location.hostname === "localhost" ||
-        window.location.hostname === "127.0.0.1"
-      ) {
-        this.API_URL = "http://127.0.0.1:5001/api/chat";
-        console.log("🔧 Running in development mode. API URL:", this.API_URL);
-      } else {
-        // Production URL
-        console.log("🚀 Running in production mode. API URL:", this.API_URL);
-      }
+      console.log("Running chatbot with local LLM backend. API URL:", this.API_URL);
 
       this.initializeUI();
       this.setupEventListeners();
       this.isInitialized = true;
-      console.log("✅ Chatbot initialized successfully");
+      console.log("Chatbot initialized successfully");
     } catch (error) {
-      console.error("❌ Chatbot initialization failed:", error);
+      console.error("Chatbot initialization failed:", error);
       this.showError("Failed to initialize chatbot. Please refresh the page.");
     }
   }
@@ -77,18 +67,7 @@ class PortfolioChatbot {
 
     // Process message and get response
     try {
-      // Set a warning timeout for 30 seconds
-      const timeoutWarningId = setTimeout(() => {
-        this.addMessage(
-          "⚠️ The model is powered by free resources. Due to resource constraints, initial load-up might take some time. Thanks for your patience!",
-          "bot"
-        );
-      }, 30000); // 30 seconds
-
       const response = await this.processMessage(message);
-
-      // Clear the warning timeout if response arrives in time
-      clearTimeout(timeoutWarningId);
 
       // Hide typing indicator
       this.hideTyping();
@@ -105,13 +84,13 @@ class PortfolioChatbot {
     } catch (error) {
       this.hideTyping();
       let errorMessage =
-        "Sorry, I encountered an error connecting to the AI server.";
+        "Sorry, something went wrong.";
 
       if (error.message.includes("Server returned")) {
         errorMessage += ` (${error.message})`;
       } else if (error.message === "Failed to fetch") {
         errorMessage +=
-          " (Network Error: Backend might be sleeping or unreachable)";
+          " (Network Error: Server unreachable)";
       } else {
         errorMessage += ` (Details: ${error.message})`;
       }

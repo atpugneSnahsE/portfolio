@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import MessageBubble from "./MessageBubble";
 import ChatInput from "./ChatInput";
 
@@ -8,6 +8,18 @@ type Message = {
   role: "user" | "assistant";
   text: string;
 };
+
+function TypingIndicator() {
+  return (
+    <div className="flex w-full justify-start">
+      <div className="flex items-center gap-1.5 rounded-3xl border border-zinc-200 bg-white px-5 py-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <span className="h-2 w-2 animate-bounce rounded-full bg-zinc-400 [animation-delay:0ms]" />
+        <span className="h-2 w-2 animate-bounce rounded-full bg-zinc-400 [animation-delay:150ms]" />
+        <span className="h-2 w-2 animate-bounce rounded-full bg-zinc-400 [animation-delay:300ms]" />
+      </div>
+    </div>
+  );
+}
 
 export default function ChatWindow() {
   const [messages, setMessages] = useState<Message[]>([
@@ -20,6 +32,12 @@ export default function ChatWindow() {
 
   const [loading, setLoading] =
     useState(false);
+
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, loading]);
 
   const sendMessage = async (
     message: string
@@ -132,12 +150,9 @@ export default function ChatWindow() {
           />
         ))}
 
-        {loading && (
-          <MessageBubble
-            role="assistant"
-            text="Thinking..."
-          />
-        )}
+        {loading && <TypingIndicator />}
+
+        <div ref={bottomRef} />
       </div>
 
       <ChatInput
